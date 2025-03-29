@@ -1,73 +1,83 @@
 import React from "react";
-import { FaInstagram, FaTelegram, FaTwitter } from "react-icons/fa";
+import { FaYoutube, FaTelegram, FaTwitter } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-900 text-white py-12 m-0">
+    <footer className="bg-gray-900 text-white h-[550px] md:h-[350px] flex items-center">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* First Column - Logo */}
-          <div className="flex items-center">
-            <div className="text-3xl font-bold bg-white text-gray-900 w-12 h-12 rounded-full flex items-center justify-center">
+        <div className="flex flex-col md:flex-row gap-8 justify-center items-center">
+          {/* First Column - Logo and Tagline */}
+          <div className="mb-6 md:mb-0 md:pr-16 flex flex-col justify-center items-center pt-12">
+            <div className="text-3xl font-bold bg-yellow-400 text-gray-900 w-16 h-16 rounded-full flex items-center justify-center mb-3">
               CT
             </div>
+            <p className="text-xl">Let's Learn with Fun</p>
           </div>
 
+          {/* First Divider */}
+          <div className="hidden md:block w-[1px] h-48 bg-gradient-to-b from-transparent via-yellow-400 to-transparent mx-8"></div>
+
           {/* Second Column - Links */}
-          <div className="space-y-4">
+          <div className="flex flex-col space-y-3 mb-6 md:mb-0 md:px-8 items-center">
             <Link
               to="/about"
-              className="block hover:text-gray-300 transition-colors"
+              className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
               About
             </Link>
             <Link
               to="/terms"
-              className="block hover:text-gray-300 transition-colors"
+              className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
-              Terms of Service
+              terms of services
             </Link>
             <Link
               to="/privacy"
-              className="block hover:text-gray-300 transition-colors"
+              className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
-              Privacy Policy
+              privacy policy
             </Link>
             <Link
               to="/contact"
-              className="block hover:text-gray-300 transition-colors"
+              className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
-              Contact Us
+              contact us
             </Link>
           </div>
 
+          {/* Second Divider */}
+          <div className="hidden md:block w-[1px] h-48 bg-gradient-to-b from-transparent via-yellow-400 to-transparent mx-8"></div>
+
           {/* Third Column - Social Media Icons */}
-          <div className="flex space-x-6 items-start">
-            <a
-              href="https://instagram.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-2xl hover:text-pink-500 transition-colors"
-            >
-              <FaInstagram />
-            </a>
-            <a
-              href="https://telegram.org"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-2xl hover:text-blue-400 transition-colors"
-            >
-              <FaTelegram />
-            </a>
-            <a
-              href="https://twitter.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-2xl hover:text-blue-500 transition-colors"
-            >
-              <FaTwitter />
-            </a>
+          <div className="flex flex-col md:pl-16">
+            <h2 className="text-2xl font-bold text-yellow-400 mb-4">Join our Family</h2>
+            <div className="flex space-x-8">
+              <a
+                href="https://youtube.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"
+              >
+                <FaYoutube />
+              </a>
+              <a
+                href="https://telegram.org"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"
+              >
+                <FaTelegram />
+              </a>
+              <a
+                href="https://twitter.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"
+              >
+                <FaTwitter />
+              </a>
+            </div>
           </div>
         </div>
       </div>

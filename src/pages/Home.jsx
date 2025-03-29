@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from "react";
-import InfiniteScroll from "../components/InfiniteScroll";
+import FeatureCards from "../components/FeatureCards";
+import TestimonialScroll from "../components/TestimonialScroll";
+import StatsCounter from "../components/StatsCounter";
+import HeroSection from "../components/HeroSection";
+import JeeNotifications from '../components/JeeNotifications';
 
 const Home = () => {
   const [services, setServices] = useState([]);
@@ -124,34 +128,15 @@ const Home = () => {
 
   return (
     <div className="flex flex-col w-full max-w-full mx-auto bg-white">
-      {/* First Section - Concept Talk */}
-      <section className="min-h-[100vh] flex flex-col">
-        <div
-          className="text-center flex flex-col md:flex-row max-w-full justify-around items-center pt-16 md:pt-32 px-4 md:px-0 h-[80vh]"
-          style={{ background: "#ffd9f1" }}
-        >
-          <div className="max-w-2xl mx-auto p-8 md:p-28">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              CONCEPT TALK
-            </h1>
-          </div>
-          <div className="max-w-3xl mx-auto py-8 md:py-20 px-4 md:px-8">
-            <h2 className="text-xl md:text-2xl font-semibold mb-2">
-              Get the Best College with Expert Counseling!
-            </h2>
-            <p className="text-sm mb-4">LET'S LEARN WITH FUN</p>
-            <button className="bg-yellow-300 hover:bg-yellow-400 text-gray-800 font-medium py-2 px-6 rounded-full">
-              JOIN US
-            </button>
-          </div>
-        </div>
-        <div className="w-full text-center text-sm text-gray-800 py-4">
-          <p>
-            VIEWS | Students Connected with US | LAST YEAR CONNECTED STUDENTS
-          </p>
-          <hr className="w-10/12 border-t-2 border-gray-400 mt-4 px-4 mx-auto" />
-        </div>
-      </section>
+      {/* Hero Section */}
+      <HeroSection />
+
+      {/* Stats Section */}
+      <StatsCounter />
+
+      <div>
+        <JeeNotifications />
+      </div>
 
       {/* Second Section - Why Choose Us */}
       <section className="min-h-screen flex flex-col px-2 md:px-4 items-center justify-between py-8">
@@ -163,94 +148,27 @@ const Home = () => {
             Take a step to clear IIT JEE with flying colors today
           </p>
         </div>
+        <FeatureCards />
 
-        <div className="w-full md:w-screen h-auto md:h-[60vh] grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 bg-gradient-to-b from-yellow-200 to-pink-200 p-4 md:p-8">
-          <div className="w-full md:w-3/4 rounded-lg p-4 md:p-6 h-full flex items-center justify-center mx-auto">
-            {loading ? (
-              <p>Loading services...</p>
-            ) : error ? (
-              <p className="text-red-500">{error}</p>
-            ) : (
-              <div className="h-full flex flex-col justify-center w-full">
-                <div className="space-y-4 flex flex-col justify-center items-center">
-                  {services.map((service) => (
-                    <div
-                      key={service.id}
-                      className="flex flex-col justify-center items-center p-4 bg-white/90 rounded-lg shadow-md w-full md:w-5/6 transition-transform hover:scale-105"
-                    >
-                      <h3 className="font-bold text-lg md:text-xl text-center mb-2">
-                        "{service.title}"
-                      </h3>
-                      <p className="text-sm md:text-base text-center text-gray-700">
-                        {service.description}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="w-full md:w-96 h-32 md:h-full bg-pink-300 rounded-lg flex flex-col items-center justify-center mx-auto">
-            {/* <InfiniteScroll
-              items={items}
-              isTilted={false}
-              tiltDirection="left"
-              autoplay={true}
-              autoplaySpeed={0.1}
-              autoplayDirection="down"
-              pauseOnHover={true}
-            /> */}
-          </div>
-        </div>
-
-        <div className="bg-white p-4 md:p-6 rounded-lg mt-8 text-center w-full max-w-4xl mx-auto">
-          <p className="text-lg font-bold md:text-lg">
-            We guide <span className="text-yellow-400 font-bold">JEE</span>{" "}
-            students to select their{" "}
-            <span className="text-yellow-400 font-bold">dream college</span>{" "}
-            based on their{" "}
-            <span className="text-pink-400 font-bold">
-              scores and preferences
-            </span>
-            .
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <p className="text-center text-gray-700 text-lg md:text-xl lg:text-4xl font-bold leading-relaxed">
+            We guide <span className="text-yellow-300">JEE</span> students to select their <span className="text-yellow-300">dream college</span> based on their <span className="text-pink-400">scores and preferences</span>.
           </p>
         </div>
       </section>
 
       {/* Third Section - Testimonials */}
-      <section className="min-h-screen bg-pink-100 p-8">
-        <div className="text-center mb-8">
-          <h2 className="text-5xl font-bold mb-2 p-4 border-b-2 sm:text-3xl border-black w-fit mx-auto">
-            Testimonials
-          </h2>
-          <p className="text-gray-400 text-2xl font-semibold">
-            What Our Students Say
-          </p>
+      {loading ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-purple-500"></div>
         </div>
-
-        {loading ? (
-          <p className="text-center">Loading testimonials...</p>
-        ) : error ? (
-          <p className="text-center text-red-500">{error}</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-4">
-            {testimonials.map((testimonial) => (
-              <div
-                key={testimonial.id}
-                className="bg-pink-300 rounded-full p-6 flex items-center "
-              >
-                <div className="bg-green-200 w-12 h-12 rounded-full flex items-center justify-center mr-4">
-                  <div className="bg-white w-8 h-8 rounded-full"></div>
-                </div>
-                <div className="text-white">
-                  <div className="font-bold">{testimonial.name}</div>
-                  <div>{testimonial.content}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
+      ) : error ? (
+        <div className="min-h-screen flex items-center justify-center">
+          <p className="text-red-500 text-xl">{error}</p>
+        </div>
+      ) : (
+        <TestimonialScroll testimonials={testimonials} />
+      )}
     </div>
   );
 };
