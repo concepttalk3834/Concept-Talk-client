@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import { FaGoogle } from "react-icons/fa";
 
 const Login = ({ isLogin, setIsLogin }) => {
   const [formData, setFormData] = useState({
@@ -18,102 +20,134 @@ const Login = ({ isLogin, setIsLogin }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Login attempt with:", formData);
-    // Here you would typically handle authentication
   };
 
   return (
-    <div className="flex min-h-screen bg-white">
+    <div className="flex min-h-screen bg-white overflow-hidden">
       {/* Left Section - Yellow Background with Text */}
-      <div className="hidden md:flex md:w-1/3 bg-yellow-300 items-center justify-center rounded-r-3xl text-center p-8">
-        <div>
-          <p className="text-2xl font-bold">
-            Run Video related to
+      <motion.div 
+        initial={{ x: "-100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "100%" }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+        className="hidden md:flex md:w-1/2 bg-gradient-to-br from-yellow-400 to-yellow-500 items-center justify-center rounded-r-3xl relative overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-black/10"></div>
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="relative z-10 text-center p-8"
+        >
+          <h2 className="text-4xl font-bold text-white mb-6">Welcome Back!</h2>
+          <p className="text-xl text-white/90 leading-relaxed">
+            Your journey to success starts here.
             <br />
-            counselling
-            <br />
-            or
-            <br />
-            interaction video with
-            <br />
-            student
+            Let's make your dreams come true.
           </p>
-        </div>
-      </div>
-
-      {/* Right Section - Login Form */}
-      <div className="w-full md:w-1/2 p-8 flex flex-col items-center justify-center">
-        <div className="w-full max-w-md">
-          <h1 className="text-4xl font-bold mb-8 text-center">
-            Welcome Back !!!
-          </h1>
-
-          {/* Profile Icon */}
-          <div className="flex justify-center mb-6">
-            <div className="bg-black rounded-full w-24 h-24 flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">CT</span>
+          <div className="mt-8">
+            <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-3xl font-bold text-yellow-500">CT</span>
             </div>
           </div>
+        </motion.div>
+      </motion.div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
+      {/* Right Section - Login Form */}
+      <motion.div 
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        exit={{ x: "-100%" }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
+        className="w-full md:w-1/2 p-6 md:p-8 flex flex-col items-center justify-center"
+      >
+        <div className="w-full max-w-md">
+          <motion.h1 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-3xl md:text-4xl font-bold mb-8 text-center"
+          >
+            Sign In
+          </motion.h1>
+
+          <motion.form 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            onSubmit={handleSubmit} 
+            className="space-y-6"
+          >
+            <div className="space-y-2">
               <input
                 type="email"
                 name="email"
                 placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-full"
+                className="w-full p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
                 required
               />
             </div>
 
-            <div>
+            <div className="space-y-2">
               <input
                 type="password"
                 name="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-full"
+                className="w-full p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
                 required
               />
-              <div className="text-right mt-2">
-                <a href="#" className="text-black">
-                  Forget Password ?
+              <div className="text-right">
+                <a href="#" className="text-yellow-500 hover:text-yellow-600 transition">
+                  Forgot Password?
                 </a>
               </div>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
-              className="w-full p-4 bg-pink-400 text-white rounded-full font-medium hover:bg-pink-500 transition"
+              className="w-full p-4 bg-yellow-400 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors"
             >
-              Login
-            </button>
+              Sign In
+            </motion.button>
 
-            <div className="text-center mt-2">
+            <div className="text-center space-y-4">
               <Link
                 to="/auth"
-                className="text-black"
+                className="text-gray-600 hover:text-yellow-500 transition"
                 onClick={(e) => {
                   e.preventDefault();
                   setIsLogin(!isLogin);
                 }}
               >
-                Don't have an Account?
+                Don't have an Account? Sign Up
               </Link>
-              <div className="border-t border-gray-300 my-6"></div>
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300"></div>
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">Or continue with</span>
+                </div>
+              </div>
             </div>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="button"
-              className="w-full p-4 bg-pink-400 text-white rounded-full font-medium hover:bg-pink-500 transition"
+              className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
             >
+              <FaGoogle className="text-red-500" />
               Sign In with Google
-            </button>
-          </form>
+            </motion.button>
+          </motion.form>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };
