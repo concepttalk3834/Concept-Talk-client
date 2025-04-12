@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
+import { useSelector } from "react-redux";
+import { FaUserCircle, FaUserShield } from "react-icons/fa";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isAuthenticated, isAdmin } = useSelector((state) => state.auth);
 
   // Handle scroll effect
   useEffect(() => {
@@ -19,9 +23,9 @@ const Navbar = () => {
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -29,6 +33,14 @@ const Navbar = () => {
   useEffect(() => {
     setIsOpen(false);
   }, [location]);
+
+  const handleDashboardClick = () => {
+    if (isAdmin) {
+      navigate("/admin-dashboard");
+    } else {
+      navigate("/user-dashboard");
+    }
+  };
 
   const navLinks = [
     { title: "Home", path: "/" },
@@ -42,29 +54,31 @@ const Navbar = () => {
       x: "100%",
       transition: {
         staggerChildren: 0.1,
-        staggerDirection: -1
-      }
+        staggerDirection: -1,
+      },
     },
     open: {
       opacity: 1,
       x: 0,
       transition: {
         staggerChildren: 0.1,
-        staggerDirection: 1
-      }
-    }
+        staggerDirection: 1,
+      },
+    },
   };
 
   const itemVariants = {
     closed: { opacity: 0, x: 20 },
-    open: { opacity: 1, x: 0 }
+    open: { opacity: 1, x: 0 },
   };
 
   return (
     <>
-      <nav 
+      <nav
         className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-          scrolled ? 'py-2 bg-yellow-300/95 backdrop-blur-sm shadow-md' : 'py-4 bg-yellow-300'
+          scrolled
+            ? "py-2 bg-yellow-300/95 backdrop-blur-sm shadow-md"
+            : "py-4 bg-yellow-300"
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -83,7 +97,7 @@ const Navbar = () => {
                   key={link.path}
                   to={link.path}
                   className={`text-black font-medium relative group ${
-                    location.pathname === link.path ? 'font-bold' : ''
+                    location.pathname === link.path ? "font-bold" : ""
                   }`}
                 >
                   {link.title}
@@ -92,20 +106,46 @@ const Navbar = () => {
               ))}
             </div>
 
-            {/* Login Button & Mobile Menu Toggle */}
+            {/* Auth Button & Mobile Menu Toggle */}
             <div className="flex items-center space-x-4">
-              <Link 
-                to="/auth" 
-                className="
-                  bg-pink-400 text-white font-bold 
-                  py-2 px-6 rounded-full 
-                  transform transition-all 
-                  hover:scale-105 hover:shadow-lg
-                  active:scale-95
-                "
-              >
-                Login
-              </Link>
+              {!isAuthenticated ? (
+                <Link
+                  to="/auth"
+                  className="
+                    bg-pink-400 text-white font-bold 
+                    py-2 px-6 rounded-full 
+                    transform transition-all 
+                    hover:scale-105 hover:shadow-lg
+                    active:scale-95
+                  "
+                >
+                  Login
+                </Link>
+              ) : (
+                <button
+                  onClick={handleDashboardClick}
+                  className="
+                    bg-white text-black font-bold 
+                    py-2 px-4 rounded-full 
+                    transform transition-all 
+                    hover:scale-105 hover:shadow-lg
+                    active:scale-95
+                    flex items-center gap-2
+                  "
+                >
+                  {isAdmin ? (
+                    <>
+                      <FaUserShield className="text-xl" />
+                      <span>Admin Dashboard</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaUserCircle className="text-xl" />
+                      <span>My Dashboard</span>
+                    </>
+                  )}
+                </button>
+              )}
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-2 rounded-lg hover:bg-yellow-400 transition-colors"
@@ -134,18 +174,41 @@ const Navbar = () => {
                     to={link.path}
                     className={`block py-2 px-4 rounded-lg transition-colors ${
                       location.pathname === link.path
-                        ? 'bg-yellow-400 font-bold'
-                        : 'hover:bg-yellow-400'
+                        ? "bg-yellow-400 font-bold"
+                        : "hover:bg-yellow-400"
                     }`}
                   >
                     {link.title}
                   </Link>
                 </motion.div>
               ))}
-              <motion.div variants={itemVariants} className="pt-4 border-t border-yellow-400">
+              {isAuthenticated && (
+                <motion.div variants={itemVariants}>
+                  <button
+                    onClick={handleDashboardClick}
+                    className="w-full text-left py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
+                  >
+                    {isAdmin ? (
+                      <>
+                        <FaUserShield className="text-xl" />
+                        <span>Admin Dashboard</span>
+                      </>
+                    ) : (
+                      <>
+                        <FaUserCircle className="text-xl" />
+                        <span>My Dashboard</span>
+                      </>
+                    )}
+                  </button>
+                </motion.div>
+              )}
+              <motion.div
+                variants={itemVariants}
+                className="pt-4 border-t border-yellow-400"
+              >
                 <p className="text-sm text-gray-700 px-4">Need help?</p>
-                <a 
-                  href="tel:+1234567890" 
+                <a
+                  href="tel:+1234567890"
                   className="block mt-2 py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors"
                 >
                   📞 Contact Support
