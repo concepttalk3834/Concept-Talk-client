@@ -2,105 +2,97 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaGoogle } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { setUser } from "../Redux/slices/authSlice";
-import axios from "axios";
-import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
+import { signUp, googleAuth } from "../Redux/slices/authSlice";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { toast } from 'react-toastify';
 
-// Dummy data for testing
-const DUMMY_RESPONSE = {
-  token: "dummy-jwt-token",
-  user: {
-    id: "dummy-id",
-    name: "New User",
-    email: "newuser@example.com",
-    phone: "1234567890",
-    role: "user",
-    rank: "1500",
-    percentile: "90",
-  },
-};
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required("Name is required")
+    .min(3, "Name must be at least 3 characters")
+    .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
+  email: yup
+    .string()
+    .required("Email is required")
+    .email("Invalid email format"),
+  phone: yup
+    .string()
+    .required("Phone number is required")
+    .matches(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
+  password: yup
+    .string()
+    .required("Password is required")
+    .min(8, "Password must be at least 8 characters")
+    .matches(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+    ),
+  rank: yup
+    .number()
+    .typeError("Rank must be a number")
+    .positive("Rank must be a positive number")
+    .nullable(),
+  percentile: yup
+    .number()
+    .typeError("Percentile must be a number")
+    .min(0, "Percentile must be between 0 and 100")
+    .max(100, "Percentile must be between 0 and 100")
+    .nullable(),
+  category: yup
+    .string()
+    .required("Category is required")
+    .oneOf(["General", "OBC", "SC", "ST", "EWS"], "Invalid category"),
+});
 
 const SignUp = ({ isLogin, setIsLogin }) => {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    rank: "",
-    percentile: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: yupResolver(schema),
   });
-  const [loading, setLoading] = useState(false);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error, message } = useSelector((state) => state.auth);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  const onSubmit = async (data) => {
+    try {
+      await dispatch(signUp({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+        phoneNumber: data.phone,
+        userRank: data.rank,
+        percentile: data.percentile,
+        category: data.category
+      })).unwrap();
+      reset();
+      navigate("/auth");
+    } catch (err) {
+      console.error("Signup failed:", err);
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-
+  const handleGoogleSignUp = async () => {
     try {
-      let response;
-
-      // Try API call first
-      try {
-        response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/signup`,
-          formData
-        );
-      } catch (error) {
-        console.log("API call failed, using dummy data");
-        // Create dummy response with form data
-        response = {
-          data: {
-            ...DUMMY_RESPONSE,
-            user: {
-              ...DUMMY_RESPONSE.user,
-              ...formData,
-              id: `dummy-id-${Date.now()}`,
-            },
-          },
-        };
-      }
-
-      // Store the token in localStorage
-      localStorage.setItem("token", response.data.token);
-
-      // Dispatch the user data to Redux store
-      dispatch(
-        setUser({
-          ...response.data.user,
-          role: response.data.user.role || "user", // Default to user role if not specified
-        })
-      );
-
-      // Show success message
-      toast.success("Account created successfully!");
-
-      // Navigate to dashboard
-      navigate("/dashboard");
+      await dispatch(googleAuth()).unwrap();
+      // The user will be redirected to Google OAuth page
+      // After successful authentication, they will be redirected back to your app
     } catch (error) {
-      // Handle different types of errors
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        toast.error(error.response.data.message || "Signup failed");
-      } else if (error.request) {
-        // The request was made but no response was received
-        toast.error("No response from server");
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        toast.error("An error occurred");
-      }
-    } finally {
-      setLoading(false);
+      toast.error(error.message || 'Failed to initiate Google sign up');
     }
   };
 
@@ -127,77 +119,116 @@ const SignUp = ({ isLogin, setIsLogin }) => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2 }}
-            onSubmit={handleSubmit}
+            onSubmit={handleSubmit(onSubmit)}
             className="space-y-6"
           >
             <div className="space-y-2">
               <input
                 type="text"
-                name="name"
                 placeholder="Full Name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-                required
+                {...register("name")}
+                className={`w-full p-4 border ${
+                  errors.name ? "border-red-500" : "border-gray-300"
+                } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
+              {errors.name && (
+                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+              )}
             </div>
 
             <div className="space-y-2">
               <input
                 type="email"
-                name="email"
                 placeholder="Email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-                required
+                {...register("email")}
+                className={`w-full p-4 border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+              )}
             </div>
 
-            <div className="flex">
-              <div className="bg-yellow-400 text-white p-4 rounded-l-full flex items-center justify-center min-w-16">
-                +91
+            <div className="space-y-2">
+              <div className="flex">
+                <div className="bg-yellow-400 text-white p-4 rounded-l-full flex items-center justify-center min-w-16">
+                  +91
+                </div>
+                <input
+                  type="tel"
+                  placeholder="Phone Number"
+                  {...register("phone")}
+                  className={`flex-1 p-4 border ${
+                    errors.phone ? "border-red-500" : "border-gray-300"
+                  } rounded-r-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                />
               </div>
-              <input
-                type="tel"
-                name="phone"
-                placeholder="Phone Number"
-                value={formData.phone}
-                onChange={handleChange}
-                className="flex-1 p-4 border border-gray-300 rounded-r-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-                required
-              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+              )}
             </div>
 
             <div className="flex gap-4">
-              <input
-                type="text"
-                name="rank"
-                placeholder="JEE Rank"
-                value={formData.rank}
-                onChange={handleChange}
-                className="w-1/2 p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-              />
-              <input
-                type="text"
-                name="percentile"
-                placeholder="Percentile"
-                value={formData.percentile}
-                onChange={handleChange}
-                className="w-1/2 p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-              />
+              <div className="w-1/2 space-y-2">
+                <input
+                  type="text"
+                  placeholder="JEE Rank"
+                  {...register("rank")}
+                  className={`w-full p-4 border ${
+                    errors.rank ? "border-red-500" : "border-gray-300"
+                  } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                />
+                {errors.rank && (
+                  <p className="text-red-500 text-sm mt-1">{errors.rank.message}</p>
+                )}
+              </div>
+              <div className="w-1/2 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Percentile"
+                  {...register("percentile")}
+                  className={`w-full p-4 border ${
+                    errors.percentile ? "border-red-500" : "border-gray-300"
+                  } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+                />
+                {errors.percentile && (
+                  <p className="text-red-500 text-sm mt-1">{errors.percentile.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="space-y-2">
               <input
                 type="password"
-                name="password"
                 placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full p-4 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition"
-                required
+                {...register("password")}
+                className={`w-full p-4 border ${
+                  errors.password ? "border-red-500" : "border-gray-300"
+                } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <select
+                {...register("category")}
+                className={`w-full p-4 border ${
+                  errors.category ? "border-red-500" : "border-gray-300"
+                } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
+              >
+                <option value="">Select Category</option>
+                <option value="General">General</option>
+                <option value="EWS">EWS</option>
+                <option value="OBC">OBC</option>
+                <option value="SC">SC</option>
+                <option value="ST">ST</option>
+              </select>
+              {errors.category && (
+                <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+              )}
             </div>
 
             <div className="text-center space-y-4">
@@ -235,15 +266,19 @@ const SignUp = ({ isLogin, setIsLogin }) => {
               {loading ? "Creating Account..." : "Create Account"}
             </motion.button>
 
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              type="button"
-              className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <FaGoogle className="text-red-500" />
-              Sign Up with Google
-            </motion.button>
+            <div className="mt-6">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                type="button"
+                onClick={handleGoogleSignUp}
+                disabled={loading}
+                className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              >
+                <FaGoogle className="text-red-500" />
+                {loading ? 'Signing up...' : 'Sign Up with Google'}
+              </motion.button>
+            </div>
           </motion.form>
         </div>
       </motion.div>

@@ -54,7 +54,7 @@ const Footer = () => {
             <h2 className="text-2xl font-bold text-yellow-400 mb-4">Join our Family</h2>
             <div className="flex space-x-8">
               <a
-                href="https://youtube.com"
+                href="https://youtube.com/@concepttalk834?si=3YB63sLSfXNfPoTP"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"
@@ -62,7 +62,7 @@ const Footer = () => {
                 <FaYoutube />
               </a>
               <a
-                href="https://telegram.org"
+                href="https://t.me/concepttalk19"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"
@@ -70,7 +70,7 @@ const Footer = () => {
                 <FaTelegram />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://x.com/Rakeshnita"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-4xl text-yellow-400 hover:text-yellow-300 transition-colors"

@@ -11,27 +11,8 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Mock fetch functions - replace these with your actual API calls
-  const items = [
-    { content: "Text Item 1" },
-    { content: <p>Paragraph Item 2</p> },
-    { content: "Text Item 3" },
-    { content: <p>Paragraph Item 4</p> },
-    { content: "Text Item 5" },
-    { content: <p>Paragraph Item 6</p> },
-    { content: "Text Item 7" },
-    { content: <p>Paragraph Item 8</p> },
-    { content: "Text Item 9" },
-    { content: <p>Paragraph Item 10</p> },
-    { content: "Text Item 11" },
-    { content: <p>Paragraph Item 12</p> },
-    { content: "Text Item 13" },
-    { content: <p>Paragraph Item 14</p> },
-  ];
-
   const fetchServices = async () => {
     try {
-      // Simulate API call with setTimeout
       setTimeout(() => {
         const mockServices = [
           {
@@ -62,7 +43,6 @@ const Home = () => {
 
   const fetchTestimonials = async () => {
     try {
-      // Simulate API call with setTimeout
       setTimeout(() => {
         const mockTestimonials = [
           {
@@ -87,6 +67,26 @@ const Home = () => {
             name: "Vikram P.",
             content: "From confusion to clarity - thank you Concept Talk!",
           },
+          {
+            id: 5,
+            name: "Deepak R.",
+            content: "The mock tests and analysis helped me improve my weak areas significantly.",
+          },
+          {
+            id: 6,
+            name: "Shreya T.", 
+            content: "Concept Talk's study strategies helped me crack JEE Advanced in my first attempt!",
+          },
+          {
+            id: 7,
+            name: "Arjun N.",
+            content: "The mentors are highly experienced and provide excellent guidance. Highly recommended!",
+          },
+          {
+            id: 8,
+            name: "Neha G.",
+            content: "From basics to advanced concepts, they helped me build a strong foundation.",
+          }
         ];
         setTestimonials(mockTestimonials);
         setLoading(false);
@@ -120,7 +120,6 @@ const Home = () => {
     ]);
   };
 
-  // Load data on component mount
   useEffect(() => {
     fetchServices();
     fetchTestimonials();
@@ -134,9 +133,9 @@ const Home = () => {
       {/* Stats Section */}
       <StatsCounter />
 
-      <div>
+      {/* <div>
         <JeeNotifications />
-      </div>
+      </div> */}
 
       {/* Second Section - Why Choose Us */}
       <section className="min-h-screen flex flex-col px-2 md:px-4 items-center justify-between py-8">

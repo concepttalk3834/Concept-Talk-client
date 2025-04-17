@@ -7,7 +7,6 @@ const TestimonialScroll = ({ testimonials }) => {
   const containerRef = useRef(null);
   const controls = useAnimation();
 
-  // Duplicate testimonials for seamless loop
   const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
 
   useEffect(() => {

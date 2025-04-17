@@ -4,13 +4,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 import { useSelector } from "react-redux";
 import { FaUserCircle, FaUserShield } from "react-icons/fa";
+import UserDropdown from './UserDropdown';
+import concept from "../assets/conceptTalk.jpg"
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { isAuthenticated, isAdmin } = useSelector((state) => state.auth);
+  const { isAuthenticated, isAdmin, user } = useSelector((state) => state.auth);
 
   // Handle scroll effect
   useEffect(() => {
@@ -85,9 +87,9 @@ const Navbar = () => {
           <div className="flex justify-between items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
-              <div className="bg-black text-white rounded-full h-10 w-10 flex items-center justify-center transform transition-transform hover:scale-110">
-                <span className="text-xl font-bold">CT</span>
-              </div>
+              <div className="w-12 h-12 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
+              <span className="text-xl font-bold text-yellow-500">CT</span>
+            </div>
             </Link>
 
             {/* Desktop Navigation */}
@@ -122,29 +124,7 @@ const Navbar = () => {
                   Login
                 </Link>
               ) : (
-                <button
-                  onClick={handleDashboardClick}
-                  className="
-                    bg-white text-black font-bold 
-                    py-2 px-4 rounded-full 
-                    transform transition-all 
-                    hover:scale-105 hover:shadow-lg
-                    active:scale-95
-                    flex items-center gap-2
-                  "
-                >
-                  {isAdmin ? (
-                    <>
-                      <FaUserShield className="text-xl" />
-                      <span>Admin Dashboard</span>
-                    </>
-                  ) : (
-                    <>
-                      <FaUserCircle className="text-xl" />
-                      <span>My Dashboard</span>
-                    </>
-                  )}
-                </button>
+                <UserDropdown user={user} />
               )}
               <button
                 onClick={() => setIsOpen(!isOpen)}
@@ -184,22 +164,7 @@ const Navbar = () => {
               ))}
               {isAuthenticated && (
                 <motion.div variants={itemVariants}>
-                  <button
-                    onClick={handleDashboardClick}
-                    className="w-full text-left py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors flex items-center gap-2"
-                  >
-                    {isAdmin ? (
-                      <>
-                        <FaUserShield className="text-xl" />
-                        <span>Admin Dashboard</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaUserCircle className="text-xl" />
-                        <span>My Dashboard</span>
-                      </>
-                    )}
-                  </button>
+                  <UserDropdown user={user} />
                 </motion.div>
               )}
               <motion.div

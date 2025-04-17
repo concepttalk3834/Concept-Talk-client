@@ -1,4 +1,5 @@
 import "./App.css";
+import { useEffect } from "react";
 import { Route, Routes, Navigate } from "react-router-dom";
 import AuthPage from "./pages/Auth";
 import About from "./pages/About";
@@ -11,11 +12,23 @@ import "react-toastify/dist/ReactToastify.css";
 import Dashboard from "./pages/Dashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
-import { useSelector } from "react-redux";
+import OAuthSuccess from "./pages/OAuthSuccess";
+import { useSelector, useDispatch } from "react-redux";
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import { getProfile } from './Redux/slices/dashboardSlice';
 
 // Protected Route component
 const ProtectedRoute = ({ children, isAdmin }) => {
-  const { isAuthenticated } = useSelector((state) => state.auth);
+  const { isAuthenticated, loading } = useSelector((state) => state.auth);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-pink-500"></div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
@@ -25,6 +38,15 @@ const ProtectedRoute = ({ children, isAdmin }) => {
 };
 
 function App() {
+  const dispatch = useDispatch();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(getProfile());
+    }
+  }, [isAuthenticated, dispatch]);
+
   return (
     <div className="App">
       <ToastContainer
@@ -41,9 +63,8 @@ function App() {
       />
       <Routes>
         <Route path="/auth" element={<AuthPage />} />
+        <Route path="/auth/verify-email" element={<VerifyEmailSuccess />} />
         <Route path="/verify-email-success" element={<VerifyEmailSuccess />} />
-
-        {/* Dashboard Routes */}
 
         {/* Routes with layout */}
         <Route path="/" element={<Layout />}>
@@ -75,6 +96,9 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="services" element={<Services />} />
         </Route>
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/oauth-success" element={<OAuthSuccess/>}/>
       </Routes>
     </div>
   );

@@ -1,40 +1,40 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaGoogle } from "react-icons/fa";
-import { useDispatch } from "react-redux";
-import { setUser } from "../Redux/slices/authSlice";
-import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { signIn, googleAuth, clearError } from "../Redux/slices/authSlice";
 import { toast } from "react-toastify";
-
-// Dummy user data for testing
-const DUMMY_USERS = [
-  {
-    email: "admin@example.com",
-    password: "admin123",
-    role: "admin",
-    name: "Admin User",
-    phone: "1234567890",
-  },
-  {
-    email: "user@example.com",
-    password: "user123",
-    role: "user",
-    name: "Regular User",
-    phone: "9876543210",
-    rank: "1000",
-    percentile: "95",
-  },
-];
 
 const Login = ({ isLogin, setIsLogin }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-  const [loading, setLoading] = useState(false);
+  
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    // Clear any existing errors when component mounts
+    dispatch(clearError());
+  }, [dispatch]);
+
+  useEffect(() => {
+    // Redirect if authenticated
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    // Handle errors
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -46,84 +46,27 @@ const Login = ({ isLogin, setIsLogin }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-
     try {
-      let response;
-
-      // Try API call first
-      try {
-        response = await axios.post(
-          `${process.env.REACT_APP_API_URL}/api/auth/login`,
-          formData
-        );
-      } catch (error) {
-        console.log("API call failed, using dummy data");
-        // Find matching dummy user
-        const dummyUser = DUMMY_USERS.find(
-          (user) =>
-            user.email === formData.email && user.password === formData.password
-        );
-
-        if (dummyUser) {
-          // Create dummy response
-          response = {
-            data: {
-              token: "dummy-jwt-token",
-              user: {
-                ...dummyUser,
-                id: "dummy-id",
-              },
-            },
-          };
-        } else {
-          throw new Error("Invalid credentials");
-        }
-      }
-
-      // Store the token in localStorage
-      localStorage.setItem("token", response.data.token);
-
-      // Dispatch the user data to Redux store
-      dispatch(
-        setUser({
-          ...response.data.user,
-          role: response.data.user.role || "user", // Default to user role if not specified
-        })
-      );
-
-      // Show success message
+      await dispatch(signIn(formData)).unwrap();
       toast.success("Login successful!");
-
-      // Navigate to dashboard
-      navigate("/dashboard");
-    } catch (error) {
-      // Handle different types of errors
-      if (error.response) {
-        // The request was made and the server responded with a status code
-        // that falls out of the range of 2xx
-        toast.error(error.response.data.message || "Login failed");
-      } else if (error.request) {
-        // The request was made but no response was received
-        toast.error("No response from server");
-      } else {
-        // Something happened in setting up the request that triggered an Error
-        toast.error(error.message || "Invalid credentials");
-      }
-    } finally {
-      setLoading(false);
+      navigate('/dashboard');
+    } catch (err) {
+      toast.error(err.message || "Login failed. Please try again.");
     }
+  };
+
+  const handleGoogleLogin = () => {
+    dispatch(googleAuth());
   };
 
   return (
     <div className="flex min-h-screen bg-white overflow-hidden">
-      {/* Left Section - Yellow Background with Text */}
       <motion.div
         initial={{ x: "-100%" }}
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="hidden md:flex md:w-1/2 bg-gradient-to-br from-yellow-400 to-yellow-500 items-center justify-center rounded-r-3xl relative overflow-hidden"
+        className="hidden md:flex md:w-1/2 bg-gradient-to-br bg-yellow-300/95 items-center justify-center rounded-r-3xl relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10"></div>
         <motion.div
@@ -193,12 +136,12 @@ const Login = ({ isLogin, setIsLogin }) => {
                 required
               />
               <div className="text-right">
-                <a
-                  href="#"
+                <Link
+                  to="/forgot-password"
                   className="text-yellow-500 hover:text-yellow-600 transition"
                 >
                   Forgot Password?
-                </a>
+                </Link>
               </div>
             </div>
 
@@ -241,6 +184,7 @@ const Login = ({ isLogin, setIsLogin }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
+              onClick={handleGoogleLogin}
               className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
             >
               <FaGoogle className="text-red-500" />
