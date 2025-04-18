@@ -122,8 +122,8 @@ export const googleAuth = createAsyncThunk(
   'auth/googleAuth',
   async (_, { rejectWithValue }) => {
     try {
-      console.log("google oauth")
-      window.location.href = "http://localhost:5000/oauth2/authorization/google";
+      // console.log("google oauth")
+      window.location.href = import.meta.env.VITE_APP_API_URI + "/oauth2/authorization/google";
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to initiate Google authentication');
     }

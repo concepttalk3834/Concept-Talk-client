@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { resetPassword, clearState } from '../Redux/slices/passwordResetSlice';
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
@@ -14,6 +15,10 @@ const ResetPassword = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error, message } = useSelector((state) => state.passwordReset);
+
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
 
   useEffect(() => {
     if (!token) {
@@ -66,7 +71,7 @@ const ResetPassword = () => {
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="hidden md:flex md:w-1/2 bg-gradient-to-br from-yellow-300 to-yellow-400 items-center justify-center rounded-r-3xl relative overflow-hidden"
+        className="hidden md:flex md:w-1/2 bg-pink-300 items-center justify-center rounded-r-3xl relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10"></div>
         <motion.div
@@ -75,15 +80,16 @@ const ResetPassword = () => {
           transition={{ delay: 0.2 }}
           className="relative z-10 text-center p-8"
         >
-          <h2 className="text-4xl font-bold text-white mb-6">Create New Password</h2>
-          <p className="text-xl text-white/90 leading-relaxed">
+          <h2 className="text-4xl font-bold text-black mb-6">Create New Password</h2>
+          <p className="text-xl text-black/90 leading-relaxed">
             Choose a strong password
             <br />
             to keep your account secure
           </p>
           <div className="mt-8">
             <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-3xl font-bold text-yellow-500">CT</span>
+              {/* <span className="text-3xl font-bold text-yellow-500">CT</span> */}
+              <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
           </div>
         </motion.div>
@@ -141,7 +147,7 @@ const ResetPassword = () => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className={`w-full p-4 bg-yellow-400 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
+              className={`w-full p-4 bg-gradient-to-l from-yellow-400 to-pink-300 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >

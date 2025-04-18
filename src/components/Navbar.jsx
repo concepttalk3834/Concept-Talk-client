@@ -3,9 +3,8 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 import { useSelector } from "react-redux";
-import { FaUserCircle, FaUserShield } from "react-icons/fa";
 import UserDropdown from './UserDropdown';
-import concept from "../assets/conceptTalk.jpg"
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,6 +12,10 @@ const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isAuthenticated, isAdmin, user } = useSelector((state) => state.auth);
+
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -88,7 +91,8 @@ const Navbar = () => {
             {/* Logo */}
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-12 h-12 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-xl font-bold text-yellow-500">CT</span>
+              {/* <span className="text-xl font-bold text-yellow-500">CT</span> */}
+              <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             </Link>
 

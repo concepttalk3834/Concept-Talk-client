@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const founders = [
   {
     name: "Rakesh Ranjan",
     designation: "Founder",
-    image: "src/assets/rakesh.jpg",
+    image: "docs/models-2", 
     message: "Our mission is to revolutionize the way people learn and connect through technology.",
   },
   {
     name: "Sanskriti Kashyap",
     designation: "Co-Founder",
-    image: "src/assets/bhabhi.jpg",
+    image: "docs/models-3",
     message: "We're committed to creating an inclusive platform that empowers everyone to achieve their goals.",
   },
 ];
@@ -37,6 +38,10 @@ const Founders = () => {
   const [activeTeamMember, setActiveTeamMember] = useState(null);
   const [showMobileTeamMessage, setShowMobileTeamMessage] = useState(null);
 
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
+
   return (
     <div className="max-w-7xl mx-auto p-4">
       {/* Founders Section */}
@@ -56,9 +61,9 @@ const Founders = () => {
               onHoverEnd={() => setActiveFounder(null)}
             >
               <div className="relative w-64 h-64 mx-auto">
-                <div className={"absolute inset-0 rounded-full border-4 border-purple-500"}>
+                <div className="absolute inset-0 rounded-full border-4 border-purple-500">
                   <img
-                    src={founder.image}
+                    src={getCloudinaryImageUrl(founder.image)}
                     alt={founder.name}
                     className="w-full h-full object-cover rounded-full"
                   />
@@ -127,7 +132,7 @@ const Founders = () => {
               <div className="relative w-64 h-64 mx-auto">
                 <div className="absolute inset-0 rounded-full border-4 border-pink-500">
                   <img
-                    src={member.image}
+                    src={getCloudinaryImageUrl(member.image)}
                     alt={member.name}
                     className="w-full h-full object-cover rounded-full"
                   />

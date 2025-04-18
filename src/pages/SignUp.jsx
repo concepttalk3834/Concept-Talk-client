@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from 'react-toastify';
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const schema = yup.object().shape({
   name: yup
@@ -84,6 +85,10 @@ const SignUp = ({ isLogin, setIsLogin }) => {
     } catch (err) {
       console.error("Signup failed:", err);
     }
+  };
+
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
   };
 
   const handleGoogleSignUp = async () => {
@@ -232,16 +237,18 @@ const SignUp = ({ isLogin, setIsLogin }) => {
             </div>
 
             <div className="text-center space-y-4">
+              <p className="text-gray-700">Already have an Account?{' '}
               <Link
                 to="/auth"
-                className="text-gray-600 hover:text-yellow-500 transition"
+                className="text-pink-400 hover:text-pink-500 transition"
                 onClick={(e) => {
                   e.preventDefault();
                   setIsLogin(!isLogin);
                 }}
               >
-                Already have an Account? Sign In
+                Sign In
               </Link>
+              </p>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>
@@ -259,7 +266,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className={`w-full p-4 bg-yellow-400 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
+              className={`w-full p-4 bg-gradient-to-l from-yellow-400 to-pink-300 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -289,7 +296,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
         animate={{ x: 0 }}
         exit={{ x: "-100%" }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="hidden md:flex md:w-1/2 bg-gradient-to-br from-yellow-300 to-amber-300 items-center justify-center rounded-l-3xl relative overflow-hidden"
+        className="hidden md:flex md:w-1/2 bg-pink-300 items-center justify-center rounded-l-3xl relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10"></div>
         <motion.div
@@ -298,17 +305,18 @@ const SignUp = ({ isLogin, setIsLogin }) => {
           transition={{ delay: 0.2 }}
           className="relative z-10 text-center p-8"
         >
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-4xl font-bold text-black mb-6">
             Join Our Community!
           </h2>
-          <p className="text-xl text-white/90 leading-relaxed">
+          <p className="text-xl text-black/90 leading-relaxed">
             Start your journey with us.
             <br />
             Together, we'll achieve your goals.
           </p>
           <div className="mt-8">
             <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-3xl font-bold text-yellow-500">CT</span>
+              {/* <span className="text-3xl font-bold text-yellow-500">CT</span> */}
+              <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
           </div>
         </motion.div>

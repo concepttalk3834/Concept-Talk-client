@@ -5,12 +5,17 @@ import { FaGoogle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { signIn, googleAuth, clearError } from "../Redux/slices/authSlice";
 import { toast } from "react-toastify";
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const Login = ({ isLogin, setIsLogin }) => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
   
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -66,7 +71,7 @@ const Login = ({ isLogin, setIsLogin }) => {
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ duration: 0.5, ease: "easeInOut" }}
-        className="hidden md:flex md:w-1/2 bg-gradient-to-br bg-yellow-300/95 items-center justify-center rounded-r-3xl relative overflow-hidden"
+        className="hidden md:flex md:w-1/2 bg-pink-300 items-center justify-center rounded-r-3xl relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-black/10"></div>
         <motion.div
@@ -75,15 +80,16 @@ const Login = ({ isLogin, setIsLogin }) => {
           transition={{ delay: 0.2 }}
           className="relative z-10 text-center p-8"
         >
-          <h2 className="text-4xl font-bold text-white mb-6">Welcome Back!</h2>
-          <p className="text-xl text-white/90 leading-relaxed">
+          <h2 className="text-4xl font-bold text-black mb-6">Welcome Back!</h2>
+          <p className="text-xl text-black/90 leading-relaxed">
             Your journey to success starts here.
             <br />
             Let's make your dreams come true.
           </p>
           <div className="mt-8">
             <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
-              <span className="text-3xl font-bold text-yellow-500">CT</span>
+              {/* <span className="text-3xl font-bold text-yellow-500">CT</span> */}
+              <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
           </div>
         </motion.div>
@@ -150,7 +156,7 @@ const Login = ({ isLogin, setIsLogin }) => {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className={`w-full p-4 bg-yellow-400 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
+              className={`w-full p-4 bg-gradient-to-l from-yellow-400 to-pink-300 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -158,16 +164,18 @@ const Login = ({ isLogin, setIsLogin }) => {
             </motion.button>
 
             <div className="text-center space-y-4">
+              <p className="text-gray-600">Don't have an Account?{' '}
               <Link
                 to="/auth"
-                className="text-gray-600 hover:text-yellow-500 transition"
+                className="text-pink-400 hover:text-pink-500 transition"
                 onClick={(e) => {
                   e.preventDefault();
                   setIsLogin(!isLogin);
                 }}
               >
-                Don't have an Account? Sign Up
+                 Sign Up
               </Link>
+              </p>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-300"></div>

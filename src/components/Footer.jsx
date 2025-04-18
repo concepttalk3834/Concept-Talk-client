@@ -1,8 +1,13 @@
 import React from "react";
 import { FaYoutube, FaTelegram, FaTwitter } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { cloudinaryConfig } from '../config/cloudinary';
 
 const Footer = () => {
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
+  
   return (
     <footer className="bg-gray-900 text-white h-[550px] md:h-[350px] flex items-center">
       <div className="container mx-auto px-4">
@@ -10,7 +15,8 @@ const Footer = () => {
           {/* First Column - Logo and Tagline */}
           <div className="mb-6 md:mb-0 md:pr-16 flex flex-col justify-center items-center pt-12">
             <div className="text-3xl font-bold bg-yellow-400 text-gray-900 w-16 h-16 rounded-full flex items-center justify-center mb-3">
-              CT
+              {/* CT */}
+              <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
             <p className="text-xl">Let's Learn with Fun</p>
           </div>
