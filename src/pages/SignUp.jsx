@@ -338,8 +338,9 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleGoogleSignUp}
-                disabled={loading || isSubmitting}
-                className={`w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
+                // disabled={loading || isSubmitting}
+                disabled={true}
+                className={`w-full p-4 bg-white border border-gray-300 cursor-not-allowed text-gray-700 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
                   (loading || isSubmitting) ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
                 }`}
               >

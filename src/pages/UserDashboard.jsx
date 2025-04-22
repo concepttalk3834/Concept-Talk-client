@@ -335,7 +335,8 @@ const UserDashboard = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  disabled={!profile?.phoneVerified}
+                  // disabled={profile?.phoneVerified}
+                  disabled={true}
                   className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
                     formErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                   } ${profile?.phoneVerified ? 'bg-gray-100 cursor-not-allowed' : ''}`}

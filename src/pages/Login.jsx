@@ -188,12 +188,14 @@ const Login = ({ isLogin, setIsLogin }) => {
               </div>
             </div>
 
+            
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
               onClick={handleGoogleLogin}
-              className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+              disabled={true}
+              className="w-full p-4 bg-white border cursor-not-allowed border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
             >
               <FaGoogle className="text-red-500" />
               Sign In with Google

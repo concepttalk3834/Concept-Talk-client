@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000' || import.meta.env.VITE_APP_API_URI;
+const API_URL = 'https://concepttalkjee.ap-south-1.elasticbeanstalk.com' || import.meta.env.VITE_APP_API_URI;
 
 const api = axios.create({
   baseURL: API_URL,
