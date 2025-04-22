@@ -335,13 +335,13 @@ const UserDashboard = () => {
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  disabled={profile?.phoneVerified}
+                  disabled={!profile?.phoneVerified}
                   className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
                     formErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'
                   } ${profile?.phoneVerified ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   required
                 />
-                {!profile?.phoneVerified && (
+                {/* {!profile?.phoneVerified && (
                   <button
                     type="button"
                     onClick={handleSendOtp}
@@ -354,7 +354,7 @@ const UserDashboard = () => {
                   >
                     {countdown > 0 ? `Resend in ${countdown}s` : 'Send OTP'}
                   </button>
-                )}
+                )} */}
               </div>
               {formErrors.phoneNumber && (
                 <p className="mt-1 text-sm text-red-600">{formErrors.phoneNumber}</p>
@@ -369,30 +369,30 @@ const UserDashboard = () => {
               )}
             </div>
 
-            {otpSent && !profile?.phoneVerified && (
+            {/* {otpSent && !profile?.phoneVerified && (
               <div className="form-group col-span-2">
                 <label htmlFor="verificationCode" className="block text-sm font-medium text-gray-700 mb-1">
                   Verification Code
-                </label>
-                <div className="flex space-x-2">
-                  <input
+                </label> */}
+                {/* <div className="flex space-x-2"> */}
+                  {/* <input
                     type="text"
                     id="verificationCode"
                     value={verificationCode}
                     onChange={(e) => setVerificationCode(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
                     placeholder="Enter OTP"
-                  />
-                  <button
+                  /> */}
+                  {/* <button
                     type="button"
                     onClick={handleVerifyOtp}
                     className="px-6 py-3 bg-green-500 text-white rounded-xl font-medium hover:bg-green-600 transition duration-300"
                   >
                     Verify
                   </button>
-                </div>
-              </div>
-            )}
+                </div> */}
+              {/* </div>
+            )} */}
 
             <div className="form-group">
               <label htmlFor="userRank" className="block text-sm font-medium text-gray-700 mb-1">
