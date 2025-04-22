@@ -33,19 +33,19 @@ const Footer = () => {
               About
             </Link>
             <Link
-              to="/terms"
+              to="/terms-and-conditions"
               className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
               terms of services
             </Link>
             <Link
-              to="/privacy"
+              to="/privacy-policy"
               className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
               privacy policy
             </Link>
             <Link
-              to="/contact"
+              to="https://t.me/concepttalk19"
               className="hover:text-yellow-400 transition-colors underline decoration-yellow-400"
             >
               contact us
