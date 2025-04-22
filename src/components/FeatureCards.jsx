@@ -5,21 +5,21 @@ const featureData = [
   {
     id: 1,
     title: "Personalized Counseling",
-    description: "Get one-on-one attention from expert mentors tailored to your needs and learning style. Our experienced counselors work closely with you to understand your goals.",
+    description: "We provide one-on-one personalized counseling based on your rank, preferences, and goals. Our expert mentors stay connected 24/7 to guide you at every stage of the JEE counseling process.",
     image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop",
     color: "#FFD700"
   },
   {
     id: 2,
     title: "Expert Faculty",
-    description: "Learn from the best in the field with our team of experienced IIT alumni and subject matter experts who know exactly what it takes to succeed.",
+    description: "Our team includes IITs, NITs, IIITs, BITS and experienced mentors who bring deep insights into JEE trends, cutoff patterns, and paper analysis—ensuring you're always a step ahead.",
     image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=crop",
     color: "#FF6B6B"
   },
   {
     id: 3,
     title: "Proven Track Record",
-    description: "Join thousands of successful students who have achieved their dreams through our comprehensive JEE preparation program.",
+    description: "With over 25,000 students successfully guided in the past three years, our track record speaks for itself. From choosing the right branch to securing top colleges—we help you win.",
     image: "https://images.unsplash.com/photo-1434030216411-0b793f4b4173?q=80&w=800&auto=format&fit=crop",
     color: "#4ECDC4"
   }

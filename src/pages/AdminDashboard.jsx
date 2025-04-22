@@ -1,160 +1,275 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUsers } from '../Redux/slices/adminSlice';
+import { getUsers, getAllPayments, clearError } from '../Redux/slices/adminSlice';
+import { motion } from 'framer-motion';
+import { toast } from 'react-toastify';
+import dayjs from 'dayjs';
 
 const AdminDashboard = () => {
   const dispatch = useDispatch();
-  const { users, loading, error } = useSelector((state) => state.admin);
+  const { 
+    users, 
+    payments, 
+    loading, 
+    paymentsLoading, 
+    error, 
+    paymentsError 
+  } = useSelector((state) => state.admin);
   const { user } = useSelector((state) => state.auth);
 
-  useEffect(() => {
-    dispatch(getUsers());
-  }, [dispatch]);
+  const [activeTab, setActiveTab] = useState('users');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (activeTab === 'users') {
+      dispatch(getUsers());
+    } else {
+      dispatch(getAllPayments());
+    }
+  }, [dispatch, activeTab]);
+
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+    if (paymentsError) {
+      toast.error(paymentsError);
+      dispatch(clearError());
+    }
+  }, [error, paymentsError, dispatch]);
+
+  const toggleSidebar = () => {
+    setIsSidebarOpen(!isSidebarOpen);
+  };
+
+  const renderUsersTable = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-lg shadow-md p-4 mt-20"
+    >
+      <h2 className="text-xl sm:text-2xl font-bold mb-6">Users List</h2>
+      {loading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+        </div>
+      ) : users?.length === 0 ? (
+        <p className="text-gray-600 text-center py-8">No users found.</p>
+      ) : (
+        <div className="max-w-80 lg:max-w-full overflow-auto">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b text-left">Name</th>
+                <th className="py-2 px-4 border-b text-left">Email</th>
+                <th className="py-2 px-4 border-b text-left">Phone</th>
+                <th className="py-2 px-4 border-b text-left">Category</th>
+                <th className="py-2 px-4 border-b text-left">Rank</th>
+                <th className="py-2 px-4 border-b text-left">Percentile</th>
+              </tr>
+            </thead>
+            <tbody>
+              {users?.map((user) => (
+                <tr key={user.id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{user.name}</td>
+                  <td className="py-2 px-4 border-b">{user.email}</td>
+                  <td className="py-2 px-4 border-b">{user.phoneNumber}</td>
+                  <td className="py-2 px-4 border-b">{user.category}</td>
+                  <td className="py-2 px-4 border-b">{user.userrank}</td>
+                  <td className="py-2 px-4 border-b">{user.percentile}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </motion.div>
+  );
+
+  const renderPaymentsTable = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-lg shadow-md p-4 sm:p-6"
+    >
+      <h2 className="text-xl sm:text-2xl font-bold mb-6">All Payments</h2>
+      {paymentsLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+        </div>
+      ) : payments?.length === 0 ? (
+        <p className="text-gray-600 text-center py-8">No payments found.</p>
+      ) : (
+        <div className="w-80 lg:w-full overflow-x-auto">
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b text-left">User Email</th>
+                <th className="py-2 px-4 border-b text-left">Payment ID</th>
+                <th className="py-2 px-4 border-b text-left">Order ID</th>
+                <th className="py-2 px-4 border-b text-left">Amount</th>
+                <th className="py-2 px-4 border-b text-center">Status</th>
+                <th className="py-2 px-4 border-b text-left">Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {payments
+                ?.filter(payment => payment.status !== 'created')
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .map((payment) => (
+                <tr key={payment.order_id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{payment.user.email}</td>
+                  <td className="py-2 px-4 border-b">{payment.paymentId}</td>
+                  <td className="py-2 px-4 border-b">{payment.transactionId}</td>
+                  <td className="py-2 px-4 border-b">₹{payment.amount/100}</td>
+                  <td className="py-2 px-4 border-b text-center">
+                    <span className={`px-2 py-1 rounded-full text-sm ${
+                      payment.status === 'success' 
+                        ? 'bg-green-100 text-green-800'
+                        : payment.status === 'failure'
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {payment.status}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {dayjs(payment.timestamp).format('DD-MM-YYYY')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </motion.div>
+  );
 
   return (
-    <div className="min-h-screen bg-yellow-50">
-      <section className="max-w-8xl mx-auto py-6 sm:px-6 lg:px-8 mt-20">
-        <div className="px-4 py-6 sm:px-0">
-          <div className="bg-pink-300 rounded-xl shadow-lg p-6 animate-fade-in">
-            <div className="flex justify-between items-center mb-6">
-              <div>
-                {/* <h2 className="text-xl font-semibold text-gray-800">User Management</h2> */}
-                <p className="text-2xl font-bold text-black mt-1">Welcome, {user?.name}</p>
-              </div>
-              <div className="text-sm text-gray-500">
-                Total Users: {users?.length || 0}
-              </div>
-            </div>
-            
-            {error && (
-              <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded mb-4">
-                <p className="font-medium">Error</p>
-                <p>{error}</p>
-              </div>
-            )}
-            
-            <div className="overflow-x-auto rounded-lg border border-yellow-300">
-              <table className="min-w-full divide-y divide-yellow-300">
-                <thead className="bg-yellow-300">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky left-0 bg-yellow-300 z-10">Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rank</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Percentile</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created At</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone Status</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {users?.map((user, index) => (
-                    <tr 
-                      key={user.id} 
-                      className="hover:bg-gray-50 transition-colors duration-200"
-                      style={{ animationDelay: `${index * 0.1}s` }}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 sticky left-0 bg-white z-10">
-                        {user.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.phoneNumber}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.userrank}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.percentile}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.category === 'General' ? 'bg-blue-100 text-blue-800' :
-                          user.category === 'OBC' ? 'bg-green-100 text-green-800' :
-                          user.category === 'SC' ? 'bg-purple-100 text-purple-800' :
-                          user.category === 'ST' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(user.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user.role}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.emailVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {user.emailVerified ? 'Verified' : 'Unverified'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          user.phoneVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                        }`}>
-                          {user.phoneVerified ? 'Verified' : 'Unverified'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 to-yellow-100 mt-20">
+      {/* Mobile Header */}
+      <div className="lg:hidden bg-white shadow-md p-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
+          <button
+            onClick={toggleSidebar}
+            className="p-2 rounded-lg hover:bg-gray-100"
+          >
+            <svg
+              className="w-6 h-6 text-gray-600"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
 
-            {/* Mobile View */}
-            {/* <div className="md:hidden mt-4 space-y-4">
-              {users?.map((user) => (
-                <div key={user.id} className="bg-white p-4 rounded-lg shadow border border-gray-200">
-                  <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <h3 className="font-medium text-gray-900">{user.name}</h3>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.role === 'admin' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-500">{user.email}</div>
-                    <div className="text-sm text-gray-500">{user.phoneNumber}</div>
-                    <div className="flex gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.category === 'General' ? 'bg-blue-100 text-blue-800' :
-                        user.category === 'OBC' ? 'bg-green-100 text-green-800' :
-                        user.category === 'SC' ? 'bg-purple-100 text-purple-800' :
-                        user.category === 'ST' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {user.category}
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.emailVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.emailVerified ? 'Email Verified' : 'Email Unverified'}
-                      </span>
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        user.phoneVerified ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.phoneVerified ? 'Phone Verified' : 'Phone Unverified'}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div> */}
+      <div className="flex">
+        {/* Sidebar */}
+        <div
+          className={`${
+            isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+          } lg:translate-x-0 fixed lg:static inset-y-0 left-0 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out z-20`}
+        >
+          <div className="h-full flex flex-col">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-800">Admin Panel</h2>
+              <button
+                onClick={toggleSidebar}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+              >
+                <svg
+                  className="w-5 h-5 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <nav className="flex-1 p-4">
+              <ul className="space-y-2">
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('users');
+                      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 rounded-lg text-left transition duration-300 flex items-center ${
+                      activeTab === 'users'
+                        ? 'bg-pink-400 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                      />
+                    </svg>
+                    Users
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => {
+                      setActiveTab('payments');
+                      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+                    }}
+                    className={`w-full px-4 py-3 rounded-lg text-left transition duration-300 flex items-center ${
+                      activeTab === 'payments'
+                        ? 'bg-pink-400 text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    <svg
+                      className="w-5 h-5 mr-2"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"
+                      />
+                    </svg>
+                    Payments
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
-      </section>
+
+        {/* Main Content */}
+        <div className="flex-1 p-2 py-8 lg:p-8">
+          {activeTab === 'users' ? renderUsersTable() : renderPaymentsTable()}
+        </div>
+      </div>
     </div>
   );
 };

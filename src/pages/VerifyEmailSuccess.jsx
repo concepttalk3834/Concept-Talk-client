@@ -13,7 +13,7 @@ const VerifyEmailSuccess = () => {
 
   useEffect(() => {
     const token = searchParams.get('token');
-    console.log(token)
+    // console.log(token)
     
     if (!token) {
       setVerificationStatus('error');
@@ -25,9 +25,10 @@ const VerifyEmailSuccess = () => {
     const verifyEmailToken = async () => {
       try {
         const result = await dispatch(verifyEmail(token)).unwrap();
-        console.log(result)
+        // console.log(result)
         setVerificationStatus('success');
         toast.success('Email verified successfully!');
+        navigate('/auth');
       } catch (error) {
         setVerificationStatus('error');
         toast.error(error.message || 'Failed to verify email');

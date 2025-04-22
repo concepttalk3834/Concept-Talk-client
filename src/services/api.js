@@ -48,7 +48,7 @@ api.interceptors.response.use(
       } catch (error) {
         console.error('Error clearing auth data:', error);
       }
-      window.location.href = '/login';
+      window.location.href = '/auth';
     }
     return Promise.reject(error.response?.data || error.message || 'An error occurred');
   }
@@ -68,6 +68,7 @@ export const authAPI = {
 
 export const adminAPI = {
   getUsers: () => api.get('/api/admin/getusers'),
+  getPayments: () => api.get('/api/admin/get-all-payments'),
 };
 
 export const dashboardAPI = {
@@ -98,11 +99,13 @@ export const paymentAPI = {
     message: "Payment for the service"
   }),
   updatePayment: (paymentData) => api.post('/api/user/update_payment', {
-    payment_Id: paymentData.payment_id,
-    order_Id: paymentData.order_id,
+    payment_id: paymentData.payment_id,
+    order_id: paymentData.order_id,
     status: paymentData.status,
-    plan_id: paymentData.plan_id
+    plan_id: paymentData.plan_id,
+    signature: paymentData.signature
   }),
+  getUserPayments: (email) => api.get(`/api/user/${email}`),
 };
 
 export default api; 

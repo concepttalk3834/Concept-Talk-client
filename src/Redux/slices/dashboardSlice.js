@@ -7,7 +7,7 @@ export const getProfile = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await dashboardAPI.getProfile();
-      console.log(response)
+      // console.log(response)
       return response;
     } catch (error) {
       return rejectWithValue(error.response);

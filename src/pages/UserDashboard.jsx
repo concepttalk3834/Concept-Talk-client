@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProfile, updateProfile, clearError, clearMessage } from '../Redux/slices/dashboardSlice';
 import { logout } from '../Redux/slices/authSlice';
+import { getUserPayments } from '../Redux/slices/paymentSlice';
+import dayjs from 'dayjs';
 
 import { 
   sendOtp, 
@@ -17,8 +19,11 @@ const UserDashboard = () => {
   const dispatch = useDispatch();
   const { profile, loading, error, message } = useSelector((state) => state.dashboard);
   const { user } = useSelector((state) => state.auth);
+  const { userPayments, loading: paymentsLoading } = useSelector((state) => state.payment);
 
   // console.log(profile)
+  // console.log(user)
+
   const { 
     loading: verificationLoading, 
     error: verificationError, 
@@ -36,13 +41,26 @@ const UserDashboard = () => {
     category: '',
   });
 
+  const [formErrors, setFormErrors] = useState({});
   const [verificationCode, setVerificationCode] = useState('');
 
   const [activeTab, setActiveTab] = useState('profile');
 
   useEffect(() => {
     dispatch(getProfile());
-  }, [dispatch]);
+    if (profile?.email) {
+      dispatch(getUserPayments(profile.email));
+    }
+  }, [dispatch, profile?.email]);
+
+  useEffect(() => {
+    if (userPayments) {
+      // console.log('Payment data:', userPayments);
+      userPayments.forEach(payment => {
+        // console.log('Payment date:', payment.created_at, 'Type:', typeof payment.created_at);
+      });
+    }
+  }, [userPayments]);
 
   useEffect(() => {
     if (profile) {
@@ -76,7 +94,13 @@ const UserDashboard = () => {
       toast.success(message);
       dispatch(clearMessage());
     }
-  }, [error, message, dispatch]);
+    if (verificationError) {
+      toast.error(verificationError);
+    }
+    if (verificationMessage) {
+      toast.success(verificationMessage);
+    }
+  }, [error, message, verificationError, verificationMessage, dispatch]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -84,11 +108,20 @@ const UserDashboard = () => {
       ...prev,
       [name]: value,
     }));
+    // Clear error when user starts typing
+    if (formErrors[name]) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(updateProfile(formData));
+    if (validateForm()) {
+      dispatch(updateProfile(formData));
+    }
   };
 
   const handleLogout = () => {
@@ -101,7 +134,6 @@ const UserDashboard = () => {
       return;
     }
     
-    // Validate phone number format (basic validation)
     const phoneRegex = /^[0-9]{10}$/;
     if (!phoneRegex.test(formData.phoneNumber)) {
       toast.error('Please enter a valid 10-digit phone number');
@@ -137,6 +169,51 @@ const UserDashboard = () => {
     };
   }, [dispatch]);
 
+  // Validation functions
+  const validateForm = () => {
+    const errors = {};
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const phoneRegex = /^[0-9]{10}$/;
+    const numberRegex = /^[0-9]+$/;
+
+    if (!formData.name.trim()) {
+      errors.name = 'Name is required';
+    } else if (formData.name.length < 2) {
+      errors.name = 'Name must be at least 2 characters';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Email is required';
+    } else if (!emailRegex.test(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if (!formData.phoneNumber.trim()) {
+      errors.phoneNumber = 'Phone number is required';
+    } else if (!phoneRegex.test(formData.phoneNumber)) {
+      errors.phoneNumber = 'Please enter a valid 10-digit phone number';
+    }
+
+    if (!formData.userRank.trim()) {
+      errors.userRank = 'Rank is required';
+    } else if (!numberRegex.test(formData.userRank)) {
+      errors.userRank = 'Rank must be a number';
+    }
+
+    if (!formData.percentile.trim()) {
+      errors.percentile = 'Percentile is required';
+    } else if (!numberRegex.test(formData.percentile) || formData.percentile < 0 || formData.percentile > 100) {
+      errors.percentile = 'Percentile must be a number between 0 and 100';
+    }
+
+    if (!formData.category.trim()) {
+      errors.category = 'Category is required';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const renderProfileSection = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -145,10 +222,10 @@ const UserDashboard = () => {
       className="bg-white rounded-2xl shadow-xl overflow-hidden"
     >
       {/* Header Section */}
-      <div className="bg-gradient-to-r from-pink-400 to-pink-500 px-6 py-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Profile Settings</h1>
+      <div className="bg-gradient-to-r from-pink-400 to-pink-500 px-4 sm:px-6 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+          <div className="text-center sm:text-left">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white">Profile Settings</h1>
             <p className="text-pink-100 mt-2">Manage your account information</p>
           </div>
           <div className="flex items-center space-x-4">
@@ -174,20 +251,24 @@ const UserDashboard = () => {
               <svg className="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
-              <span className="text-gray-700">Concept Talk</span>
+              <span className="text-gray-700 font-semibold">Concept Talk</span>
             </div>
             <div className="flex items-center">
               <svg className="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              <span className="text-gray-700">+1 (555) 123-4567</span>
+              <span className="text-gray-700 font-semibold">+91 8104391071</span>
+              <span className="mx-2">||</span>
+              <span className="text-gray-700 font-semibold">+91 7061545872</span>
+              <span className="mx-2">||</span>
+              <span className="text-gray-700 font-semibold">+91 7642010280</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Form Section */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div className="form-group">
@@ -200,9 +281,14 @@ const UserDashboard = () => {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
+                className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                  formErrors.name ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
               />
+              {formErrors.name && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -217,9 +303,9 @@ const UserDashboard = () => {
                   value={formData.email}
                   onChange={handleChange}
                   disabled={profile?.emailVerified}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
-                    profile?.emailVerified ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                    formErrors.email ? 'border-red-500' : 'border-gray-300'
+                  } ${profile?.emailVerified ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   required
                 />
                 {profile?.emailVerified && (
@@ -230,6 +316,9 @@ const UserDashboard = () => {
                   </div>
                 )}
               </div>
+              {formErrors.email && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+              )}
               {profile?.emailVerified && (
                 <p className="text-sm text-green-600 mt-1">Email verified and locked</p>
               )}
@@ -247,9 +336,9 @@ const UserDashboard = () => {
                   value={formData.phoneNumber}
                   onChange={handleChange}
                   disabled={profile?.phoneVerified}
-                  className={`w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
-                    profile?.phoneVerified ? 'bg-gray-100 cursor-not-allowed' : ''
-                  }`}
+                  className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                    formErrors.phoneNumber ? 'border-red-500' : 'border-gray-300'
+                  } ${profile?.phoneVerified ? 'bg-gray-100 cursor-not-allowed' : ''}`}
                   required
                 />
                 {!profile?.phoneVerified && (
@@ -267,6 +356,9 @@ const UserDashboard = () => {
                   </button>
                 )}
               </div>
+              {formErrors.phoneNumber && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.phoneNumber}</p>
+              )}
               {profile?.phoneVerified && (
                 <div className="mt-2 flex items-center text-green-600">
                   <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -312,9 +404,14 @@ const UserDashboard = () => {
                 name="userRank"
                 value={formData.userRank}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
+                className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                  formErrors.userRank ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
               />
+              {formErrors.userRank && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.userRank}</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -327,9 +424,14 @@ const UserDashboard = () => {
                 name="percentile"
                 value={formData.percentile}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
+                className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                  formErrors.percentile ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
               />
+              {formErrors.percentile && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.percentile}</p>
+              )}
             </div>
 
             <div className="form-group">
@@ -342,9 +444,14 @@ const UserDashboard = () => {
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300"
+                className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
+                  formErrors.category ? 'border-red-500' : 'border-gray-300'
+                }`}
                 required
               />
+              {formErrors.category && (
+                <p className="mt-1 text-sm text-red-600">{formErrors.category}</p>
+              )}
             </div>
           </div>
 
@@ -367,60 +474,56 @@ const UserDashboard = () => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="bg-white rounded-2xl shadow-xl overflow-hidden"
+      className="bg-white rounded-lg shadow-md p-4 sm:p-6"
     >
-      {/* Header Section */}
-      <div className="bg-gradient-to-r from-pink-400 to-pink-500 px-6 py-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-white">Payment History</h1>
-            <p className="text-pink-100 mt-2">View your transaction details</p>
-          </div>
+      <h2 className="text-xl sm:text-2xl font-bold mb-6">Payment History</h2>
+      {paymentsLoading ? (
+        <div className="flex justify-center items-center h-40">
+          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
         </div>
-      </div>
-
-      {/* Payment History Section */}
-      <div className="p-6">
+      ) : userPayments?.filter(payment => payment.status !== 'created').length === 0 ? (
+        <p className="text-gray-600 text-center py-8">No payment history found.</p>
+      ) : (
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Transaction ID</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+          <table className="min-w-full bg-white border border-gray-200">
+            <thead>
+              <tr className="bg-gray-100">
+                <th className="py-2 px-4 border-b text-left">Payment ID</th>
+                <th className="py-2 px-4 border-b text-left">Order ID</th>
+                <th className="py-2 px-4 border-b text-left">Amount</th>
+                <th className="py-2 px-4 border-b text-center">Status</th>
+                <th className="py-2 px-4 border-b text-left">Date</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {/* Sample payment data - Replace with actual data from your backend */}
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-03-15</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">TXN123456</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$99.00</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Completed
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Premium Subscription</td>
-              </tr>
-              <tr className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2024-02-28</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">TXN789012</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">$49.00</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Completed
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Course Purchase</td>
-              </tr>
+            <tbody>
+              {userPayments
+                ?.filter(payment => payment.status !== 'created')
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                .map((payment) => (
+                <tr key={payment.order_id} className="hover:bg-gray-50">
+                  <td className="py-2 px-4 border-b">{payment.paymentId}</td>
+                  <td className="py-2 px-4 border-b">{payment.transactionId}</td>
+                  <td className="py-2 px-4 border-b">₹{payment.amount/100}</td>
+                  <td className="py-2 px-4 border-b text-center">
+                    <span className={`px-2 py-1 rounded-full text-sm ${
+                      payment.status === 'success' 
+                        ? 'bg-green-100 text-green-800'
+                        : payment.status === 'failure'
+                          ? 'bg-red-100 text-red-800' 
+                          : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {payment.status}
+                    </span>
+                  </td>
+                  <td className="py-2 px-4 border-b">
+                    {dayjs(payment.timestamp).format('DD-MM-YYYY')}
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 
@@ -437,7 +540,7 @@ const UserDashboard = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Tab Navigation */}
         <div className="mb-8">
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               onClick={() => setActiveTab('profile')}
               className={`px-6 py-3 rounded-xl font-medium transition duration-300 ${

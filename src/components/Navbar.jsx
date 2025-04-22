@@ -51,6 +51,7 @@ const Navbar = () => {
     { title: "Home", path: "/" },
     { title: "About Us", path: "/about" },
     { title: "Services", path: "/services" },
+    {title: "Counselling", path: "/counselling-process"}
   ];
 
   const menuVariants = {
@@ -176,12 +177,12 @@ const Navbar = () => {
                 className="pt-4 border-t border-yellow-400"
               >
                 <p className="text-sm text-gray-700 px-4">Need help?</p>
-                <a
-                  href="tel:+1234567890"
+                <Link
+                  to="/auth"
                   className="block mt-2 py-2 px-4 rounded-lg hover:bg-yellow-400 transition-colors"
                 >
                   📞 Contact Support
-                </a>
+                </Link>
               </motion.div>
             </div>
           </motion.div>

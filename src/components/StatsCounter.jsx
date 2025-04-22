@@ -28,18 +28,18 @@ const CounterAnimation = ({ end, duration = 2 }) => {
 const statsData = [
   {
     count: 2500,
-    label: "Views",
-    description: "Monthly Active Users"
+    label: "Help Desk",
+    description: "Daily Doubts Results"
   },
   {
-    count: 1200,
+    count: 50000,
     label: "Students Connected",
     description: "Success Stories"
   },
   {
-    count: 800,
+    count: 5000,
     label: "Last Year",
-    description: "Growing Community"
+    description: "Counseling Done"
   }
 ];
 

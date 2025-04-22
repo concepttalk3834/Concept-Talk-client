@@ -15,10 +15,26 @@ export const getUsers = createAsyncThunk(
   }
 );
 
+export const getAllPayments = createAsyncThunk(
+  'admin/getAllPayments',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await adminAPI.getPayments();
+      // console.log(response)
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response);
+    }
+  }
+);
+
 const initialState = {
   users: [],
+  payments: [],
   loading: false,
   error: null,
+  paymentsLoading: false,
+  paymentsError: null,
 };
 
 const adminSlice = createSlice({
@@ -27,6 +43,7 @@ const adminSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+      state.paymentsError = null;
     },
   },
   extraReducers: (builder) => {
@@ -43,6 +60,19 @@ const adminSlice = createSlice({
       .addCase(getUsers.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Get All Payments
+      .addCase(getAllPayments.pending, (state) => {
+        state.paymentsLoading = true;
+        state.paymentsError = null;
+      })
+      .addCase(getAllPayments.fulfilled, (state, action) => {
+        state.paymentsLoading = false;
+        state.payments = action.payload;
+      })
+      .addCase(getAllPayments.rejected, (state, action) => {
+        state.paymentsLoading = false;
+        state.paymentsError = action.payload;
       });
   },
 });

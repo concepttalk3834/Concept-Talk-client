@@ -4,6 +4,8 @@ import { useInView } from 'react-intersection-observer';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Link} from "react-router-dom";
+import banner from "../assets/banner.png"
+import { cloudinaryConfig } from '../config/cloudinary';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -41,6 +43,10 @@ const HeroSection = () => {
       });
     }
   }, [inView]);
+
+  const getCloudinaryImageUrl = (publicId) => {
+    return `https://res.cloudinary.com/${cloudinaryConfig.cloudName}/image/upload/${publicId}`;
+  };
 
   const y = useTransform(scrollY, [0, 500], [0, 100]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
@@ -80,7 +86,7 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-[1400px] mx-auto px-8 md:px-16 lg:px-24">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
           {/* Logo Section */}
           <motion.div 
             ref={ref}
@@ -88,10 +94,14 @@ const HeroSection = () => {
             style={{ y, opacity }}
           >
             <div className="relative">
-              <div className="flex items-center">
-                <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-gray-900 to-gray-600">
-                  CONCEPT TALK
-                </h1>
+              <div className="flex items-center w-44 h-28 lg:w-96 lg:h-96">
+                <img 
+                  src={getCloudinaryImageUrl("banner_kbczhz")} 
+                  alt="banner" 
+                  className='w-96 h-96'
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </div>
           </motion.div>
@@ -102,21 +112,33 @@ const HeroSection = () => {
             style={{ y, opacity }}
           >
             <div className="space-y-6 flex flex-col justify-center items-center">
-              <div className="relative">
-                <h2 className="hero-subtitle text-4xl md:text-5xl font-bold text-gray-800 leading-tight">
-                  Get the Best College with{' '}
-                  <span className="relative inline-block">
-                    <span className="relative z-10">Expert</span>
-                    <span className="absolute bottom-0 left-0 w-full h-3 bg-yellow-300 -z-10 transform -rotate-1"></span>
+              <div className="relative text-center">
+                <h2 className="hero-subtitle text-4xl md:text-5xl lg:text-5xl font-bold">
+                  <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                    Achieve Your {' '}
                   </span>
-                  {' '}Counselling!
+                  {/* <br /> */}
+                  <span className="relative inline-block mt-2">
+                    <span className="relative z-10 text-pink-500">Dream</span>
+                    <span className="absolute bottom-1 left-0 w-full h-4 bg-yellow-300 -z-10 transform -rotate-2 opacity-50"></span>
+                  </span>
+                  <br />
+                  <span className="bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
+                    College with Expert JEE Counseling!
+                  </span>
                 </h2>
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-pink-200 rounded-full blur-2xl opacity-20"></div>
               </div>
               
-              <p className="text-xl text-gray-600 font-medium">
-                LET'S LEARN WITH FUN
+              <p className="text-lg text-gray-600 font-medium text-center">
+              Personalized guidance, proven strategies, and 24/7 support throughout your journey.
               </p>
+
+              <div className=" backdrop-blur-sm p-4 rounded-lg shadow-lg border border-gray-200">
+                <div>
+                  <p>To Connect with Counselor</p>
+                </div>
+              </div>
               
               <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                 <motion.button
@@ -124,7 +146,7 @@ const HeroSection = () => {
                   whileTap={{ scale: 0.95 }}
                   className="bg-gradient-to-r from-yellow-300 to-yellow-400 text-gray-800 font-semibold py-2 px-6 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 text-md"
                 >
-                  <Link to="/auth">JOIN US</Link>
+                  <Link to="/auth">JOIN NOW</Link>
                 </motion.button>
               </div>
             </div>

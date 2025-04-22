@@ -20,15 +20,33 @@ const founders = [
 const teamMembers = [
   {
     name: "Ayush",
-    designation: "Content Manager",
-    image: "src/assets/userImage.png",
-    message: "Passionate about creating innovative solutions.",
+    designation: "Counsellor Expert",
+    image: "ayush_dvjxjc",
   },
   {
     name: "Arjun",
-    designation: "Marketing Head",
-    image: "src/assets/userImage.png",
-    message: "Creating beautiful and intuitive user experiences.",
+    designation: "Counsellor Expert",
+    image: "arjun_ozrqo7",
+  },
+  {
+    name: "Lalit Kumar Jangir",
+    designation: "Counsellor Expert",
+    image: "lalit_jangir_jc44jr",
+  },
+  {
+    name: "Parasara Naik",
+    designation: "Counsellor Expert",
+    image: "prasar_cjyvqq",
+  },
+  {
+    name: "Satwik Gupta",
+    designation: "Counsellor Expert",
+    image: "satwik_htlhaa",
+  },
+  {
+    name: "Manish Chauhan",
+    designation: "Counsellor Expert",
+    image: "manish_usxdwv",
   }
 ];
 
@@ -43,9 +61,9 @@ const Founders = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-4">
+    <div className="max-w-7xl mx-auto p-2">
       {/* Founders Section */}
-      <h2 className="text-3xl pt-16 font-bold text-center text-gray-900 mb-16 italic underline underline-offset-8">
+      <h2 className="text-3xl font-bold text-center text-gray-900 mb-16 italic underline underline-offset-8">
         Meet Founders
       </h2>
       
@@ -118,7 +136,7 @@ const Founders = () => {
         Our Team
       </h2>
       
-      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 p-4">
+      <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 p-4">
         {teamMembers.map((member, index) => (
           <div key={member.name} className="relative flex flex-col items-center">
             <motion.div
@@ -129,7 +147,7 @@ const Founders = () => {
               onHoverStart={() => setActiveTeamMember(index)}
               onHoverEnd={() => setActiveTeamMember(null)}
             >
-              <div className="relative w-64 h-64 mx-auto">
+              <div className="relative w-44 h-44 mx-auto">
                 <div className="absolute inset-0 rounded-full border-4 border-pink-500">
                   <img
                     src={getCloudinaryImageUrl(member.image)}
@@ -139,34 +157,34 @@ const Founders = () => {
                 </div>
                 
                 {/* Desktop Hover Message */}
-                <div
+                {/* <div
                   className={`absolute inset-0 bg-black/70 rounded-full flex items-center justify-center p-6 transition-opacity duration-300 
                     ${activeTeamMember === index ? 'opacity-100' : 'opacity-0'} 
                     hidden md:flex`}
-                >
-                  <p className="text-white text-center text-lg font-light">
+                > */}
+                  {/* <p className="text-white text-center text-md font-light">
                     "{member.message}"
-                  </p>
-                </div>
+                  </p> */}
+                {/* </div> */}
               </div>
 
               <div className="text-center mt-6">
-                <h1 className="text-2xl font-bold text-gray-800 mb-2">{member.name}</h1>
-                <h3 className="text-xl font-semibold text-pink-600">
+                <h1 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h1>
+                <h3 className="text-lg font-semibold text-pink-600">
                   {member.designation}
                 </h3>
                 
                 {/* Mobile Message Button */}
-                <button
+                {/* <button
                   className="md:hidden mt-4 bg-pink-100 hover:bg-pink-200 text-pink-700 px-4 py-2 rounded-full 
                     transition-colors duration-300 text-sm font-medium"
                   onClick={() => setShowMobileTeamMessage(showMobileTeamMessage === index ? null : index)}
                 >
                   {showMobileTeamMessage === index ? 'Hide Message' : 'View Message'}
-                </button>
+                </button> */}
                 
                 {/* Mobile Message */}
-                {showMobileTeamMessage === index && (
+                {/* {showMobileTeamMessage === index && (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
@@ -175,7 +193,7 @@ const Founders = () => {
                   >
                     <p className="text-gray-700">"{member.message}"</p>
                   </motion.div>
-                )}
+                )} */}
               </div>
             </motion.div>
           </div>

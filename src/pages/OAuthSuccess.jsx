@@ -10,7 +10,7 @@ const OAuthSuccess = () => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const token = urlParams.get('token');
-    console.log('Token from URL:', token);
+    // console.log('Token from URL:', token);
 
     if (token) {
       localStorage.setItem('token', token);

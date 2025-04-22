@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaGoogle } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { signUp, googleAuth } from "../Redux/slices/authSlice";
+import { signUp, googleAuth, clearError } from "../Redux/slices/authSlice";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -15,75 +15,99 @@ const schema = yup.object().shape({
     .string()
     .required("Name is required")
     .min(3, "Name must be at least 3 characters")
-    .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces"),
+    .matches(/^[a-zA-Z\s]*$/, "Name can only contain letters and spaces")
+    .trim(),
   email: yup
     .string()
     .required("Email is required")
-    .email("Invalid email format"),
+    .email("Invalid email format")
+    .trim(),
   phone: yup
     .string()
     .required("Phone number is required")
-    .matches(/^[6-9]\d{9}$/, "Invalid Indian phone number"),
+    .matches(/^[6-9]\d{9}$/, "Please enter a valid 10-digit Indian mobile number"),
   password: yup
     .string()
     .required("Password is required")
     .min(8, "Password must be at least 8 characters")
     .matches(
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
-      "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
+      "Password must include: uppercase & lowercase letters, number, special character"
     ),
   rank: yup
     .number()
-    .typeError("Rank must be a number")
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .nullable()
+    .typeError("Please enter a valid JEE rank")
     .positive("Rank must be a positive number")
-    .nullable(),
+    .integer("Rank must be a whole number"),
   percentile: yup
     .number()
-    .typeError("Percentile must be a number")
+    .transform((value) => (isNaN(value) ? undefined : value))
+    .nullable()
+    .typeError("Please enter a valid percentile")
     .min(0, "Percentile must be between 0 and 100")
-    .max(100, "Percentile must be between 0 and 100")
-    .nullable(),
+    .max(100, "Percentile must be between 0 and 100"),
   category: yup
     .string()
-    .required("Category is required")
-    .oneOf(["General", "OBC", "SC", "ST", "EWS"], "Invalid category"),
+    .required("Please select your category")
+    .oneOf(["General", "OBC", "SC", "ST", "EWS"], "Please select a valid category"),
 });
 
 const SignUp = ({ isLogin, setIsLogin }) => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
     reset,
+    watch,
   } = useForm({
     resolver: yupResolver(schema),
+    mode: "onChange",
   });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { loading, error, message } = useSelector((state) => state.auth);
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  const { loading, error, isAuthenticated } = useSelector((state) => state.auth);
+
+  // Clear errors when component unmounts or when switching forms
+  useEffect(() => {
+    dispatch(clearError());
+    return () => dispatch(clearError());
+  }, [dispatch]);
+
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard");
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Handle API errors
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+  }, [error, dispatch]);
 
   const onSubmit = async (data) => {
     try {
       await dispatch(signUp({
-        name: data.name,
-        email: data.email,
+        name: data.name.trim(),
+        email: data.email.trim(),
         password: data.password,
         phoneNumber: data.phone,
-        userRank: data.rank,
-        percentile: data.percentile,
+        userRank: data.rank || null,
+        percentile: data.percentile || null,
         category: data.category
       })).unwrap();
+      
+      toast.success("Account created successfully! Please verify your email.");
       reset();
-      navigate("/auth");
+      setIsLogin(true); // Switch to login form
     } catch (err) {
-      console.error("Signup failed:", err);
+      toast.error(err.message || "Failed to create account. Please try again.");
     }
   };
 
@@ -94,12 +118,22 @@ const SignUp = ({ isLogin, setIsLogin }) => {
   const handleGoogleSignUp = async () => {
     try {
       await dispatch(googleAuth()).unwrap();
-      // The user will be redirected to Google OAuth page
-      // After successful authentication, they will be redirected back to your app
+      toast.info("Redirecting to Google Sign Up...");
     } catch (error) {
       toast.error(error.message || 'Failed to initiate Google sign up');
     }
   };
+
+  // Password requirements list
+  const passwordRequirements = [
+    { regex: /.{8,}/, text: "At least 8 characters" },
+    { regex: /[A-Z]/, text: "One uppercase letter" },
+    { regex: /[a-z]/, text: "One lowercase letter" },
+    { regex: /[0-9]/, text: "One number" },
+    { regex: /[@$!%*?&]/, text: "One special character" },
+  ];
+
+  const password = watch("password");
 
   return (
     <div className="flex min-h-screen bg-white overflow-hidden">
@@ -126,6 +160,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
             transition={{ delay: 0.2 }}
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6"
+            noValidate
           >
             <div className="space-y-2">
               <input
@@ -137,7 +172,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
               {errors.name && (
-                <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
+                <p className="text-red-500 text-sm ml-4">{errors.name.message}</p>
               )}
             </div>
 
@@ -151,7 +186,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
+                <p className="text-red-500 text-sm ml-4">{errors.email.message}</p>
               )}
             </div>
 
@@ -163,6 +198,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 <input
                   type="tel"
                   placeholder="Phone Number"
+                  maxLength="10"
                   {...register("phone")}
                   className={`flex-1 p-4 border ${
                     errors.phone ? "border-red-500" : "border-gray-300"
@@ -170,35 +206,38 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 />
               </div>
               {errors.phone && (
-                <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>
+                <p className="text-red-500 text-sm ml-4">{errors.phone.message}</p>
               )}
             </div>
 
             <div className="flex gap-4">
               <div className="w-1/2 space-y-2">
                 <input
-                  type="text"
-                  placeholder="JEE Rank"
+                  type="number"
+                  placeholder="JEE Rank (Optional)"
                   {...register("rank")}
                   className={`w-full p-4 border ${
                     errors.rank ? "border-red-500" : "border-gray-300"
                   } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 />
                 {errors.rank && (
-                  <p className="text-red-500 text-sm mt-1">{errors.rank.message}</p>
+                  <p className="text-red-500 text-sm ml-4">{errors.rank.message}</p>
                 )}
               </div>
               <div className="w-1/2 space-y-2">
                 <input
-                  type="text"
-                  placeholder="Percentile"
+                  type="number"
+                  placeholder="Percentile (Optional)"
+                  step="0.01"
+                  min="0"
+                  max="100"
                   {...register("percentile")}
                   className={`w-full p-4 border ${
                     errors.percentile ? "border-red-500" : "border-gray-300"
                   } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
                 />
                 {errors.percentile && (
-                  <p className="text-red-500 text-sm mt-1">{errors.percentile.message}</p>
+                  <p className="text-red-500 text-sm ml-4">{errors.percentile.message}</p>
                 )}
               </div>
             </div>
@@ -213,7 +252,27 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
               />
               {errors.password && (
-                <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                <p className="text-red-500 text-sm ml-4">{errors.password.message}</p>
+              )}
+              {password && (
+                <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Password requirements:</p>
+                  <ul className="space-y-1">
+                    {passwordRequirements.map((req, index) => (
+                      <li
+                        key={index}
+                        className={`text-sm flex items-center ${
+                          req.regex.test(password) ? 'text-green-600' : 'text-gray-500'
+                        }`}
+                      >
+                        <span className="mr-2">
+                          {req.regex.test(password) ? '✓' : '○'}
+                        </span>
+                        {req.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
             </div>
 
@@ -232,22 +291,22 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 <option value="ST">ST</option>
               </select>
               {errors.category && (
-                <p className="text-red-500 text-sm mt-1">{errors.category.message}</p>
+                <p className="text-red-500 text-sm ml-4">{errors.category.message}</p>
               )}
             </div>
 
             <div className="text-center space-y-4">
               <p className="text-gray-700">Already have an Account?{' '}
-              <Link
-                to="/auth"
-                className="text-pink-400 hover:text-pink-500 transition"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsLogin(!isLogin);
-                }}
-              >
-                Sign In
-              </Link>
+                <Link
+                  to="/auth"
+                  className="text-pink-400 hover:text-pink-500 transition"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setIsLogin(!isLogin);
+                  }}
+                >
+                  Sign In
+                </Link>
               </p>
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
@@ -265,12 +324,12 @@ const SignUp = ({ isLogin, setIsLogin }) => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
-              disabled={loading}
-              className={`w-full p-4 bg-gradient-to-l from-yellow-400 to-pink-300 text-white rounded-full font-medium hover:bg-yellow-500 transition-colors ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
+              disabled={loading || isSubmitting}
+              className={`w-full p-4 bg-gradient-to-l from-yellow-400 to-pink-300 text-white rounded-full font-medium transition-colors ${
+                (loading || isSubmitting) ? "opacity-50 cursor-not-allowed" : "hover:bg-yellow-500"
               }`}
             >
-              {loading ? "Creating Account..." : "Create Account"}
+              {(loading || isSubmitting) ? "Creating Account..." : "Create Account"}
             </motion.button>
 
             <div className="mt-6">
@@ -279,18 +338,20 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleGoogleSignUp}
-                disabled={loading}
-                className="w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                disabled={loading || isSubmitting}
+                className={`w-full p-4 bg-white border border-gray-300 text-gray-700 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
+                  (loading || isSubmitting) ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
+                }`}
               >
                 <FaGoogle className="text-red-500" />
-                {loading ? 'Signing up...' : 'Sign Up with Google'}
+                {(loading || isSubmitting) ? 'Signing up...' : 'Sign Up with Google'}
               </motion.button>
             </div>
           </motion.form>
         </div>
       </motion.div>
 
-      {/* Right Section - Yellow Background with Text */}
+      {/* Right Section - Pink Background with Text */}
       <motion.div
         initial={{ x: "100%" }}
         animate={{ x: 0 }}
@@ -315,7 +376,6 @@ const SignUp = ({ isLogin, setIsLogin }) => {
           </p>
           <div className="mt-8">
             <div className="w-24 h-24 mx-auto bg-white rounded-full flex items-center justify-center shadow-lg">
-              {/* <span className="text-3xl font-bold text-yellow-500">CT</span> */}
               <img src={getCloudinaryImageUrl("docs/models")} alt="Logo" className="w-full h-full object-cover rounded-full" />
             </div>
           </div>

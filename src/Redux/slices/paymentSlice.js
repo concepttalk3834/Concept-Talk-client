@@ -7,6 +7,7 @@ export const createOrder = createAsyncThunk(
   async (amount, { rejectWithValue }) => {
     try {
       const response = await paymentAPI.createOrder(amount);
+      // console.log(response)
       return response;
     } catch (error) {
       return rejectWithValue(error.response);
@@ -15,29 +16,29 @@ export const createOrder = createAsyncThunk(
 );
 
 export const updatePayment = createAsyncThunk(
-  'payment/update',
+  'payment/updatePayment',
   async (paymentData, { rejectWithValue }) => {
     try {
+      // console.log('Updating payment with data:', paymentData);
       const response = await paymentAPI.updatePayment(paymentData);
-      console.log(response)
+      // console.log('Payment update response:', response);
       return response;
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message || error.response?.data || error.message || 'Payment update failed';
-      return rejectWithValue(errorMessage);
+      // console.error('Payment update error:', error.response?.data || error.message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to update payment');
     }
   }
 );
-
 
 export const getUserPayments = createAsyncThunk(
   'payment/getUserPayments',
   async (email, { rejectWithValue }) => {
     try {
       const response = await paymentAPI.getUserPayments(email);
-      return response.data;
+      // console.log(response)
+      return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response);
     }
   }
 );
@@ -47,6 +48,7 @@ const initialState = {
   loading: false,
   error: null,
   message: null,
+  userPayments: [],
 };
 
 const paymentSlice = createSlice({
@@ -98,7 +100,7 @@ const paymentSlice = createSlice({
       })
       .addCase(getUserPayments.fulfilled, (state, action) => {
         state.loading = false;
-        state.payments = action.payload;
+        state.userPayments = action.payload;
       })
       .addCase(getUserPayments.rejected, (state, action) => {
         state.loading = false;
