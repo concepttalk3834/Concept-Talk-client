@@ -61,7 +61,8 @@ const Login = ({ isLogin, setIsLogin }) => {
   };
 
   const handleGoogleLogin = () => {
-    dispatch(googleAuth());
+    // dispatch(googleAuth());
+    toast.info('Google sign-in is currently unavailable');
   };
 
   return (
@@ -198,7 +199,7 @@ const Login = ({ isLogin, setIsLogin }) => {
               className="w-full p-4 bg-white border cursor-not-allowed border-gray-300 text-gray-700 rounded-full font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
             >
               <FaGoogle className="text-red-500" />
-              Sign In with Google
+              Sign In with Google (Coming Soon)
             </motion.button>
           </motion.form>
         </div>

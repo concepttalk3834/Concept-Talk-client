@@ -116,12 +116,13 @@ const SignUp = ({ isLogin, setIsLogin }) => {
   };
 
   const handleGoogleSignUp = async () => {
-    try {
-      await dispatch(googleAuth()).unwrap();
-      toast.info("Redirecting to Google Sign Up...");
-    } catch (error) {
-      toast.error(error.message || 'Failed to initiate Google sign up');
-    }
+    // try {
+    //   await dispatch(googleAuth()).unwrap();
+    //   toast.info("Redirecting to Google Sign Up...");
+    // } catch (error) {
+    //   toast.error(error.message || 'Failed to initiate Google sign up');
+    // }
+    toast.info('Google sign-up is currently unavailable');
   };
 
   // Password requirements list
@@ -338,14 +339,13 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 whileTap={{ scale: 0.98 }}
                 type="button"
                 onClick={handleGoogleSignUp}
-                // disabled={loading || isSubmitting}
                 disabled={true}
                 className={`w-full p-4 bg-white border border-gray-300 cursor-not-allowed text-gray-700 rounded-full font-medium transition-colors flex items-center justify-center gap-2 ${
                   (loading || isSubmitting) ? "opacity-50 cursor-not-allowed" : "hover:bg-gray-50"
                 }`}
               >
                 <FaGoogle className="text-red-500" />
-                {(loading || isSubmitting) ? 'Signing up...' : 'Sign Up with Google'}
+                <span>Sign Up with Google (Coming Soon)</span>
               </motion.button>
             </div>
           </motion.form>

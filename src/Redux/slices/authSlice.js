@@ -122,7 +122,10 @@ export const googleAuth = createAsyncThunk(
   'auth/googleAuth',
   async (_, { rejectWithValue }) => {
     try {
-      // console.log("google oauth")
+      // Return early while feature is disabled
+      return rejectWithValue('Google authentication is currently unavailable');
+      
+      // The following code will not execute while feature is disabled
       const apiUrl = import.meta.env.VITE_APP_API_URI || 'https://api.concepttalk.in';
       window.location.href = `${apiUrl}/oauth2/authorization/google`;
     } catch (error) {
