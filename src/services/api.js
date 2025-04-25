@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'https://api.concepttalk.in' || import.meta.env.VITE_APP_API_URI;
+const API_URL =  import.meta.env.VITE_APP_API_URI || 'https://api.concepttalk.in';
 
 const api = axios.create({
   baseURL: API_URL,
