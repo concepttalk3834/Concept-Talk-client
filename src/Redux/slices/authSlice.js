@@ -123,7 +123,8 @@ export const googleAuth = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       // console.log("google oauth")
-      window.location.href = import.meta.env.VITE_APP_API_URI + "/oauth2/authorization/google";
+      const apiUrl = import.meta.env.VITE_APP_API_URI || 'https://api.concepttalk.in';
+      window.location.href = `${apiUrl}/oauth2/authorization/google`;
     } catch (error) {
       return rejectWithValue(error.message || 'Failed to initiate Google authentication');
     }
