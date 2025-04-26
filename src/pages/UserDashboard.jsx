@@ -194,13 +194,13 @@ const UserDashboard = () => {
       errors.phoneNumber = 'Please enter a valid 10-digit phone number';
     }
 
-    if (!formData.userRank.trim()) {
+    if (!formData.userRank) {
       errors.userRank = 'Rank is required';
     } else if (!numberRegex.test(formData.userRank)) {
       errors.userRank = 'Rank must be a number';
     }
 
-    if (!formData.percentile.trim()) {
+    if (!formData.percentile) {
       errors.percentile = 'Percentile is required';
     } else if (!numberRegex.test(formData.percentile) || formData.percentile < 0 || formData.percentile > 100) {
       errors.percentile = 'Percentile must be a number between 0 and 100';

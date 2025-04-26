@@ -93,13 +93,16 @@ const SignUp = ({ isLogin, setIsLogin }) => {
 
   const onSubmit = async (data) => {
     try {
+      const userRank = data.rank ? parseInt(data.rank, 10) : null;
+      const percentile = data.percentile ? parseFloat(data.percentile) : null;
+
       await dispatch(signUp({
         name: data.name.trim(),
         email: data.email.trim(),
         password: data.password,
         phoneNumber: data.phone,
-        userRank: data.rank || null,
-        percentile: data.percentile || null,
+        userRank: userRank,
+        percentile: percentile,
         category: data.category
       })).unwrap();
       
@@ -216,7 +219,9 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                 <input
                   type="number"
                   placeholder="JEE Rank (Optional)"
-                  {...register("rank")}
+                  {...register("rank",{
+                    setValueAs: value => value === "" ? null : parseInt(value, 10)
+                  })}
                   className={`w-full p-4 border ${
                     errors.rank ? "border-red-500" : "border-gray-300"
                   } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
@@ -232,7 +237,9 @@ const SignUp = ({ isLogin, setIsLogin }) => {
                   step="0.01"
                   min="0"
                   max="100"
-                  {...register("percentile")}
+                  {...register("percentile", {
+                    setValueAs: value => value === "" ? null : parseFloat(value)
+                  })}
                   className={`w-full p-4 border ${
                     errors.percentile ? "border-red-500" : "border-gray-300"
                   } rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition`}
