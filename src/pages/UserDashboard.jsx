@@ -242,26 +242,28 @@ const UserDashboard = () => {
       </div>
 
       {/* Welcome Message Section */}
-      <div className="bg-yellow-50 px-8 py-4 border-b border-yellow-200">
+      <div className="bg-yellow-50 px-4 sm:px-8 py-4 border-b border-yellow-200">
         <div className="max-w-xl mx-auto">
           <p className="text-gray-700 text-lg">
             Great! We are happy to connect with you. You can contact us at:
           </p>
-          <div className="mt-2 flex items-center space-x-4">
+          <div className="mt-2 flex flex-col sm:flex-row items-start sm:items-center sm:space-x-4 space-y-3 sm:space-y-0">
             <div className="flex items-center">
               <svg className="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               <span className="text-gray-700 font-semibold">Concept Talk</span>
             </div>
-            <div className="flex items-center">
-              <svg className="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-              </svg>
-              <span className="text-gray-700 font-semibold">+91 8104391071</span>
-              <span className="mx-2">||</span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0">
+              <div className="flex items-center">
+                <svg className="w-5 h-5 text-gray-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                <span className="text-gray-700 font-semibold">+91 8104391071</span>
+              </div>
+              <div className="hidden sm:block mx-2">||</div>
               <span className="text-gray-700 font-semibold">+91 7061545872</span>
-              <span className="mx-2">||</span>
+              <div className="hidden sm:block mx-2">||</div>
               <span className="text-gray-700 font-semibold">+91 7642010280</span>
             </div>
           </div>

@@ -44,47 +44,53 @@ const AdminDashboard = () => {
   };
 
   const renderUsersTable = () => (
+    
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-lg shadow-md p-4 mt-20"
-    >
-      <h2 className="text-xl sm:text-2xl font-bold mb-6">Users List</h2>
-      {loading ? (
-        <div className="flex justify-center items-center h-40">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
-        </div>
-      ) : users?.length === 0 ? (
-        <p className="text-gray-600 text-center py-8">No users found.</p>
-      ) : (
-        <div className="max-w-80 lg:max-w-full overflow-auto">
-          <table className="min-w-full bg-white border border-gray-200">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="py-2 px-4 border-b text-left">Name</th>
-                <th className="py-2 px-4 border-b text-left">Email</th>
-                <th className="py-2 px-4 border-b text-left">Phone</th>
-                <th className="py-2 px-4 border-b text-left">Category</th>
-                <th className="py-2 px-4 border-b text-left">Rank</th>
-                <th className="py-2 px-4 border-b text-left">Percentile</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users?.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50">
-                  <td className="py-2 px-4 border-b">{user.name}</td>
-                  <td className="py-2 px-4 border-b">{user.email}</td>
-                  <td className="py-2 px-4 border-b">{user.phoneNumber}</td>
-                  <td className="py-2 px-4 border-b">{user.category}</td>
-                  <td className="py-2 px-4 border-b">{user.userrank}</td>
-                  <td className="py-2 px-4 border-b">{user.percentile}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </motion.div>
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="bg-white rounded-lg shadow-md p-4 sm:p-6 mt-20"
+>
+  <h2 className="text-xl sm:text-2xl font-bold mb-6">Users List</h2>
+
+  {loading ? (
+    <div className="flex justify-center items-center h-40">
+      <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-pink-500"></div>
+    </div>
+  ) : users?.length === 0 ? (
+    <p className="text-gray-500 text-center py-8">No users found.</p>
+  ) : (
+    <div className="w-80 md:w-[700px] lg:w-full overflow-x-auto">
+      <table className="min-w-full bg-white border border-gray-200">
+        <thead className="bg-gray-100 text-gray-700 uppercase text-xs leading-normal">
+          <tr className="bg-gray-100">
+            <th className="py-3 px-4 text-left">Name</th>
+            <th className="py-3 px-4 text-left">Email</th>
+            <th className="py-3 px-4 text-left">Phone</th>
+            <th className="py-3 px-4 text-left">Category</th>
+            <th className="py-3 px-4 text-left">Rank</th>
+            <th className="py-3 px-4 text-left">Percentile</th>
+          </tr>
+        </thead>
+        <tbody className="text-gray-600">
+          {users?.map((user) => (
+            <tr
+              key={user.id}
+              className="border-b hover:bg-gray-50 transition-all duration-200"
+            >
+              <td className="py-3 px-4 break-words">{user.name}</td>
+              <td className="py-3 px-4 break-words">{user.email}</td>
+              <td className="py-3 px-4 break-words">{user.phoneNumber}</td>
+              <td className="py-3 px-4 break-words">{user.category}</td>
+              <td className="py-3 px-4">{user.userrank}</td>
+              <td className="py-3 px-4">{user.percentile}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )}
+</motion.div>
+
   );
 
   const renderPaymentsTable = () => (
