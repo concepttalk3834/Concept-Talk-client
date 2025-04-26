@@ -175,6 +175,7 @@ const UserDashboard = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const phoneRegex = /^[0-9]{10}$/;
     const numberRegex = /^[0-9]+$/;
+    const decimalRegex = /^(100(\.0+)?|[0-9]{1,2}(\.[0-9]+)?)$/;
 
     if (!formData.name.trim()) {
       errors.name = 'Name is required';
@@ -202,7 +203,7 @@ const UserDashboard = () => {
 
     if (!formData.percentile) {
       errors.percentile = 'Percentile is required';
-    } else if (!numberRegex.test(formData.percentile) || formData.percentile < 0 || formData.percentile > 100) {
+    } else if (!decimalRegex.test(formData.percentile) || formData.percentile < 0 || formData.percentile > 100) {
       errors.percentile = 'Percentile must be a number between 0 and 100';
     }
 
@@ -425,6 +426,10 @@ const UserDashboard = () => {
                 name="percentile"
                 value={formData.percentile}
                 onChange={handleChange}
+                step="0.01"
+                min="0"
+                max="100"
+                placeholder="Enter percentile (e.g., 98.23)"
                 className={`w-full px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent transition duration-300 ${
                   formErrors.percentile ? 'border-red-500' : 'border-gray-300'
                 }`}
