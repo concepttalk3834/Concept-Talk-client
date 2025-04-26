@@ -218,7 +218,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
               <div className="w-1/2 space-y-2">
                 <input
                   type="number"
-                  placeholder="JEE Rank (Optional)"
+                  placeholder="JEE Rank"
                   {...register("rank",{
                     setValueAs: value => value === "" ? null : parseInt(value, 10)
                   })}
@@ -233,7 +233,7 @@ const SignUp = ({ isLogin, setIsLogin }) => {
               <div className="w-1/2 space-y-2">
                 <input
                   type="number"
-                  placeholder="Percentile (Optional)"
+                  placeholder="Percentile"
                   step="0.01"
                   min="0"
                   max="100"
