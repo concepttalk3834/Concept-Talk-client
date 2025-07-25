@@ -8,6 +8,7 @@ const TestimonialScroll = ({ testimonials }) => {
   const controls = useAnimation();
 
   const duplicatedTestimonials = [...testimonials, ...testimonials, ...testimonials];
+  // console.log(selectedTestimonial);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -55,7 +56,7 @@ const TestimonialScroll = ({ testimonials }) => {
                 <FaQuoteLeft className="text-4xl text-purple-200 absolute top-4 left-4" />
                 <div className="mt-8 mb-6">
                   <p className="text-lg md:text-xl text-gray-700 leading-relaxed">
-                    {selectedTestimonial.content}
+                    {selectedTestimonial?.content}
                   </p>
                 </div>
                 <div className="flex items-center gap-4">
@@ -98,12 +99,12 @@ const TestimonialScroll = ({ testimonials }) => {
                   onClick={() => setSelectedTestimonial(testimonial)}
                   whileHover={{ y: -5 }}
                 >
-                  <p className="text-gray-600 mb-4">{testimonial.content}</p>
+                  <p className="text-gray-600 mb-4">{testimonial?.content}</p>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white font-semibold">
-                      {testimonial.name.charAt(0)}
+                      {testimonial?.name?.charAt(0)}
                     </div>
-                    <span className="font-medium text-gray-800">{testimonial.name}</span>
+                    <span className="font-medium text-gray-800">{testimonial?.name}</span>
                   </div>
                 </motion.div>
               ))}

@@ -114,7 +114,7 @@ const Navbar = () => {
             </div>
 
             {/* Auth Button & Mobile Menu Toggle */}
-            <div className="flex items-center space-x-4">
+            {/* <div className="flex items-center space-x-4">
               {!isAuthenticated ? (
                 <Link
                   to="/auth"
@@ -137,7 +137,7 @@ const Navbar = () => {
               >
                 {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
               </button>
-            </div>
+            </div> */}
           </div>
         </div>
       </nav>

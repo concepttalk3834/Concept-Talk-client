@@ -4,12 +4,13 @@ import { motion } from 'framer-motion';
 import { createOrder, updatePayment } from '../Redux/slices/paymentSlice';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { FaWhatsapp } from 'react-icons/fa';
 
 const Services = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
-  const { order, loading, error } = useSelector((state) => state.payment);
+  // const { user, isAuthenticated } = useSelector((state) => state.auth);
+  // const { order, loading, error } = useSelector((state) => state.payment);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
@@ -20,11 +21,11 @@ const Services = () => {
       title: "Basic Plan",
       features: [
         "Full Counselling guidance and support till admission",
-        "JOSAA Guidance and support",
+        "CSAB Guidance and support",
         "24*7 doubts solving through Text on Whatsapp",
         "Personalised choice filling list",
       ],
-      price: "699",
+      price: "899",
       fixedPrice: "1000",
       highlight: false,
     },
@@ -32,10 +33,10 @@ const Services = () => {
       id: 2,
       title: "Complete Plan",
       features: [
-        "JOSAA + CSAB complete counselling process by Mentor",
+        "CSAB complete counselling process by Mentor",
         "One student : one mentor provided",
         "Doubt solving through calls and texts 24*7 ",
-        "Choice filling of JOSAA + CSAB by expert Counsellors",
+        "Choice filling of CSAB by expert Counsellors",
         "Regular Zoom calls with mentor",
         "Full guidance and support till you get admission",
         "100% guarantee to help you to get the best on your rank and preferences.",
@@ -50,10 +51,10 @@ const Services = () => {
       id: 3,
       title: "Premium Plan",
       features: [
-        "JOSAA + CSAB + State Engineering + Private Colleges Counselling complete guidance and support",
+        "CSAB + State Engineering Colleges Counselling complete guidance and support",
         "One student : one mentor provided",
         "Doubt solving through calls and texts 24*7",
-        "Choice filling of JOSAA + CSAB+ STATE ENGINEERING + PRIVATE COLLEGES Counselling by Expert Counsellors",
+        "Choice filling of CSAB+ STATE ENGINEERING Colleges Counselling by Expert Counsellors",
         "Full guidance and support till you get admission.",
         "Regular Zoom calls with mentor",
         "100% guarantee to help you to get the best on your rank and preferences",
@@ -98,11 +99,11 @@ const Services = () => {
   const handlePayment = async (plan) => {
     try {
       // Check if user is authenticated
-      if (!isAuthenticated) {
-        toast.error('Please login to continue with the payment');
-        navigate('/auth');
-        return;
-      }
+      // if (!isAuthenticated) {
+      //   toast.error('Please login to continue with the payment');
+      //   navigate('/auth');
+      //   return;
+      // }
 
       // Check if Razorpay is loaded
       if (!razorpayLoaded) {
@@ -113,38 +114,65 @@ const Services = () => {
       setSelectedPlan(plan);
       
       // Create order
-      const orderResponse = await dispatch(createOrder(plan.price)).unwrap();
+      // const orderResponse = await dispatch(createOrder(plan.price)).unwrap();
 
-      if (orderResponse.status === "created") {
+      // if (orderResponse.status === "created") {
+        // const options = {
+        //   key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        //   amount: orderResponse.amount,
+        //   currency: 'INR',
+        //   name: 'Concept Talk',
+        //   description: `Payment for ${plan.title}`,
+        //   order_id: orderResponse.id,
+        //   handler: async function (response) {
+        //     try {
+        //       const paymentData = {
+        //         payment_id: response.razorpay_payment_id,
+        //         order_id: response.razorpay_order_id,
+        //         status: 'success',
+        //         plan_id: plan.id,
+        //         signature: response.razorpay_signature,
+        //       };
+              
+        //       const result = await dispatch(updatePayment(paymentData)).unwrap();
+        //       toast.success('Payment successful! Redirecting to dashboard...');
+        //       setTimeout(() => {
+        //         navigate('/dashboard');
+        //       }, 2000);
+        //     } catch (error) {
+        //       toast.error('Payment verification failed. Please contact support if amount was deducted.');
+        //     }
+        //   },
+        //   prefill: {
+        //     name: user?.name || '',
+        //     email: user?.email || '',
+        //   },
+        //   theme: {
+        //     color: '#FF69B4',
+        //   },
+        //   modal: {
+        //     ondismiss: function() {
+        //       toast.info('Payment cancelled');
+        //       setSelectedPlan(null);
+        //     }
+        //   }
+        // };
+
         const options = {
           key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-          amount: orderResponse.amount,
+          amount: plan.price * 100,
           currency: 'INR',
           name: 'Concept Talk',
           description: `Payment for ${plan.title}`,
-          order_id: orderResponse.id,
-          handler: async function (response) {
-            try {
-              const paymentData = {
-                payment_id: response.razorpay_payment_id,
-                order_id: response.razorpay_order_id,
-                status: 'success',
-                plan_id: plan.id,
-                signature: response.razorpay_signature,
-              };
-              
-              const result = await dispatch(updatePayment(paymentData)).unwrap();
-              toast.success('Payment successful! Redirecting to dashboard...');
-              setTimeout(() => {
-                navigate('/dashboard');
-              }, 2000);
-            } catch (error) {
-              toast.error('Payment verification failed. Please contact support if amount was deducted.');
-            }
+          handler: function (response) {
+            toast.success('Payment successful! Please contact support for confirmation.');
+            setTimeout(() => {
+              navigate('/');
+            }, 2000);
           },
           prefill: {
-            name: user?.name || '',
-            email: user?.email || '',
+            name: '',
+            email: '',
           },
           theme: {
             color: '#FF69B4',
@@ -159,27 +187,33 @@ const Services = () => {
 
         const rzp1 = new window.Razorpay(options);
 
-        rzp1.on('payment.failed', async function (response) {
-          try {
-            const paymentData = {
-              payment_id: response.error.metadata.payment_id,
-              order_id: response.error.metadata.order_id,
-              status: 'failure',
-              plan_id: plan.id,
-              error_code: response.error.code,
-              error_description: response.error.description
-            };
+        // rzp1.on('payment.failed', async function (response) {
+        //   try {
+        //     const paymentData = {
+        //       payment_id: response.error.metadata.payment_id,
+        //       order_id: response.error.metadata.order_id,
+        //       status: 'failure',
+        //       plan_id: plan.id,
+        //       error_code: response.error.code,
+        //       error_description: response.error.description
+        //     };
             
-            await dispatch(updatePayment(paymentData)).unwrap();
-            toast.error(`Payment failed: ${response.error.description}`);
-            setSelectedPlan(null);
-          } catch (error) {
-            toast.error('Failed to update payment status. Please contact support.');
-          }
+        //     await dispatch(updatePayment(paymentData)).unwrap();
+        //     toast.error(`Payment failed: ${response.error.description}`);
+        //     setSelectedPlan(null);
+        //   } catch (error) {
+        //     toast.error('Failed to update payment status. Please contact support.');
+        //   }
+        // });
+
+        rzp1.on('payment.failed', function (response) {
+          toast.error(`Payment failed: ${response.error.description}`);
+          setSelectedPlan(null);
+          // No need to call rzp1.close(); Razorpay will close the modal automatically
         });
 
         rzp1.open();
-      }
+      // }
     } catch (error) {
       toast.error(error.message || 'Payment initialization failed. Please try again.');
       setSelectedPlan(null);
@@ -195,15 +229,36 @@ const Services = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 to-pink-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
+        <div className="mb-8 mt-4">
+          <div className="bg-pink-100 border border-pink-300 rounded-lg p-4 text-center">
+            <span className="text-pink-700 font-extrabold text-lg mr-2">
+              NOTE:-
+            </span>
+            <span className="text-pink-700 font-semibold text-lg">
+              After doing payment, send the screenshot of payment along with your other details (Name, Mobile Number, Email, Percentile, Rank) 
+              on <a
+                href="https://wa.me/917642010280?text=Hi%2C%20I%20have%20completed%20the%20payment%20for%20Concept%20Talk.%20Here%20are%20my%20details%3A%20Name%3A%20%5BYour%20Name%5D%2C%20Mobile%3A%20%5BYour%20Mobile%5D%2C%20Email%3A%20%5BYour%20Email%5D%2C%20Percentile%3A%20%5BYour%20Percentile%5D%2C%20Rank%3A%20%5BYour%20Rank%5D.%20Screenshot%20attached."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-green-600 underline font-bold hover:text-green-800 transition inline-flex items-center"
+              >
+                <FaWhatsapp className="inline-block mr-1 text-green-600 text-xl" />
+                +91-7642010280
+              </a>.
+              <br />
+              Thank you for trusting CONCEPT TALK.
+            </span>
+          </div>
+        </div>
         <motion.div 
           className="text-center my-10"
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span className="bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+          {/* <span className="bg-pink-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
             PRICING
-          </span>
+          </span> */}
           <h1 className="text-4xl font-bold text-gray-900 mt-6">
             Choose the perfect plan for you
           </h1>
@@ -266,12 +321,12 @@ const Services = () => {
                           </div>
                           <span className="ml-1 text-xl font-semibold text-gray-500">/one-time</span>
                         </div>
-                        <div className="mt-1">
-                          <span className="line-through text-lg text-gray-400">₹{plan.fixedPrice}</span>
-                          <span className="ml-2 text-sm text-green-500 font-medium">
+                        {/* <div className="mt-1"> */}
+                          {/* <span className="line-through text-lg text-gray-400">₹{plan.fixedPrice}</span> */}
+                          {/* <span className="ml-2 text-sm text-green-500 font-medium">
                             Save {Math.round(((plan.fixedPrice - plan.price) / plan.fixedPrice) * 100)}%
-                          </span>
-                        </div>
+                          </span> */}
+                        {/* </div> */}
                       </div>
                     </div>
                   </div>
@@ -318,20 +373,22 @@ const Services = () => {
 
                   <button
                     onClick={() => handlePayment(plan)}
-                    disabled={loading && selectedPlan?.id === plan.id}
+                    disabled={selectedPlan?.id === plan.id}
                     className={`mt-8 w-full py-3 px-6 rounded-xl font-semibold
                       transform transition-all duration-300 hover:scale-[1.02]
                       focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2 shadow-lg
-                      ${loading && selectedPlan?.id === plan.id
+                      ${selectedPlan?.id === plan.id
                         ? 'bg-gray-400 cursor-not-allowed'
                         : 'bg-pink-500 hover:bg-pink-600 text-white'
                       }`}
                   >
-                    {loading && selectedPlan?.id === plan.id
+                    {/* {loading && selectedPlan?.id === plan.id
                       ? 'Processing...'
                       : isAuthenticated
                         ? 'Get Started'
-                        : 'Login to Purchase'}
+                        : 'Login to Purchase'} */}
+
+                      Get Started
                   </button>
                 </div>
               </div>

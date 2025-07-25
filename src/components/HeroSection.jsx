@@ -140,7 +140,7 @@ const HeroSection = () => {
                 </div>
               </div>
               
-              <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
+              {/* <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center lg:justify-start pt-4">
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -148,7 +148,7 @@ const HeroSection = () => {
                 >
                   <Link to="/auth">JOIN NOW</Link>
                 </motion.button>
-              </div>
+              </div> */}
             </div>
           </motion.div>
         </div>
