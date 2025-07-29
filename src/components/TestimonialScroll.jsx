@@ -47,7 +47,7 @@ const TestimonialScroll = ({ testimonials }) => {
           <div className="relative">
             <AnimatePresence mode="wait">
               <motion.div
-                key={selectedTestimonial.id}
+                key={selectedTestimonial?.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
@@ -92,7 +92,7 @@ const TestimonialScroll = ({ testimonials }) => {
                 <motion.div
                   key={`${testimonial.id}-${index}`}
                   className={`p-6 mb-6 cursor-pointer transform transition-all duration-300 hover:scale-105 ${
-                    selectedTestimonial.id === testimonial.id
+                    selectedTestimonial?.id === testimonial?.id
                       ? 'bg-white shadow-lg scale-105'
                       : 'bg-white/80'
                   } rounded-xl mx-4`}
