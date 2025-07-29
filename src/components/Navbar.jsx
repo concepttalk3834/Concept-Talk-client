@@ -114,8 +114,8 @@ const Navbar = () => {
             </div>
 
             {/* Auth Button & Mobile Menu Toggle */}
-            {/* <div className="flex items-center space-x-4">
-              {!isAuthenticated ? (
+            <div className="flex items-center space-x-4">
+              {/* {!isAuthenticated ? (
                 <Link
                   to="/auth"
                   className="
@@ -130,14 +130,14 @@ const Navbar = () => {
                 </Link>
               ) : (
                 <UserDropdown user={user} />
-              )}
+              )} */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
                 className="md:hidden p-2 rounded-lg hover:bg-yellow-400 transition-colors"
               >
                 {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
               </button>
-            </div> */}
+            </div>
           </div>
         </div>
       </nav>

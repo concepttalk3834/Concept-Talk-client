@@ -61,10 +61,10 @@ const TestimonialScroll = ({ testimonials }) => {
                 </div>
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center text-white text-2xl font-bold">
-                    {selectedTestimonial.name.charAt(0)}
+                    {selectedTestimonial?.name.charAt(0)}
                   </div>
                   <div>
-                    <h4 className="text-xl font-semibold text-gray-800">{selectedTestimonial.name}</h4>
+                    <h4 className="text-xl font-semibold text-gray-800">{selectedTestimonial?.name}</h4>
                     <div className="flex gap-1 text-yellow-400 mt-1">
                       {[...Array(5)].map((_, i) => (
                         <FaStar key={i} />
